@@ -6,7 +6,9 @@ Created on Sat Apr 13 03:09:20 2024
 """
 
 import subprocess, shutil, os, configparser
-w3x2lni = 'w3x2lni\w2l.exe'
+config = configparser.ConfigParser(interpolation=None)
+config.read("config.ini")
+w3x2lni = config["Settings"]["w3x2lni"]
 
 class war3Map:
     
@@ -51,11 +53,13 @@ class war3Map:
         """
         
         if debug:
+            print(w3x2lni)
             print("Unpacking map: "+self.name)
         
         self.backup()
         self.lnipath = "Temp\\"+self.name+"_tmp"
-        subprocess.run(["cmd", "/c", w3x2lni, "lni", self.w3xpath, self.lnipath])
+        cwd = os.getcwd()
+        subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = w3x2lni)
         return self
     
     def pack(self, debug = False):
@@ -70,5 +74,6 @@ class war3Map:
         if debug:
             print("Packing map: "+self.name)
         
-        subprocess.run(["cmd", "/c", w3x2lni, "obj", self.lnipath, self.w3xpath])
+        cwd = os.getcwd()
+        subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = w3x2lni)
         return self
