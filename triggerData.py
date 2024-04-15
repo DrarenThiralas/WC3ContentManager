@@ -162,8 +162,6 @@ class triggerData:
         """
         Adds the variables from the content pack
         into the map's variable list.
-        
-        TODO: the whole function (needs lml parser)
 
         Parameters
         ----------
@@ -175,7 +173,35 @@ class triggerData:
         None.
 
         """
-        variables = self.packPath+"\\variable.lml"
+        
+
+        
+        variableSourcePath = self.packPath+"\\triggerData\\variable.lml"
+
+        
+        variableTargetPath = w3map.lnipath+"\\trigger\\variable.lml"
+        
+        if os.path.exists(variableTargetPath):
+            
+            parser = lmlParser()
+            
+            variableSource = parser.read(variableSourcePath)
+            variableTarget = parser.read(variableTargetPath)
+            
+            for entry in variableSource.children:
+                targetNames = list(map(lambda x: x.name, variableTarget.children))
+                if entry.name in targetNames:
+                    variableTarget.children[targetNames.index(entry.name)] = entry
+                else:
+                    variableTarget.children.append(entry)
+                    
+            parser.write(variableTarget, variableTargetPath)
+            
+        else:
+            
+            shutil.copy(variableSourcePath, variableTargetPath)
+        
+        
         
             
     def apply(self, w3map, dataTypes):
@@ -194,8 +220,9 @@ class triggerData:
         None.
 
         """
+
         
-        if "customscript" in dataTypes:
+        if "customscript" in dataTypes and os.path.exists(self.customScript):
             shutil.copy(self.customScript, w3map.lnipath+"\\trigger\\code.j")
         
         if "trigger" in dataTypes:
@@ -207,5 +234,5 @@ class triggerData:
             for category in triggerCategories:
                 category.apply(w3map)
         
-        if "vars" in dataTypes:
+        if "vars" in dataTypes and os.path.exists(self.packPath+"\\triggerData\\variable.lml"):
            self.updateVariables(w3map)

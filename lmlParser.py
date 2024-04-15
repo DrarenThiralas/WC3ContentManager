@@ -5,10 +5,6 @@ Created on Sat Apr 13 17:56:26 2024
 @author: maxer
 """
 
-testPath = 'ContentPacks\\Pack2\\triggerData\\Coop - General Systems\\catalog.lml'
-testPath2 = 'ContentPacks\\Pack2\\triggerData\\Coop - General Systems\\catalogNew.lml'
-
-
 
 class lmlLine:
     
