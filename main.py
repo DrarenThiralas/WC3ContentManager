@@ -6,8 +6,9 @@ Created on Fri Apr 12 18:12:14 2024
 """
 
 import sys
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget, QDialog, QPushButton, QLineEdit, QFileDialog, QGridLayout, QCheckBox, QLayoutItem, QInputDialog
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import subprocess, shutil, os
 
 from mapData import war3Map
@@ -82,15 +83,27 @@ def executeFunction():
     maps = [mp[2:-1] for mp in maps]
     maps = [war3Map(mp) for mp in maps]
     
+    progressTotal = 3*len(maps)+2
+    progressDialog = QProgressDialog("Importing...", "Cancel", 0, progressTotal)
+    progressDialog.setWindowModality(Qt.WindowModality.WindowModal)
+    
     shutil.rmtree("Temp\\", ignore_errors=True)
     os.mkdir("Temp\\")
-    
-    maps = list(map(lambda x: x.unpack(True), maps))
+    progressDialog.setValue(1)
+
+    for mp, i in zip(maps, range(len(maps))):       
+        maps[i] = mp.unpack(True)
+        progressDialog.setValue(i+1)
         
     for pack in contentPacks:
         maps = list(map(pack.apply, maps))
+        progressDialog.setValue(i+1+len(maps))
         
-    maps = list(map(lambda x: x.pack(True), maps))
+    for mp, i in zip(maps, range(len(maps))):       
+        maps[i] = mp.pack(True)
+        progressDialog.setValue(i+1+len(maps)*2)
+        
+    progressDialog.setValue(progressTotal)
         
     resultMsg.setText("Content packs imported!")
     

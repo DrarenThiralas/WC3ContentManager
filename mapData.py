@@ -52,9 +52,10 @@ class war3Map:
 
         """
         
+        message = "Unpacking map: "+self.name
+        
         if debug:
-            print(w3x2lni)
-            print("Unpacking map: "+self.name)
+            print(message)
         
         self.backup()
         self.lnipath = "Temp\\"+self.name+"_tmp"
@@ -71,8 +72,10 @@ class war3Map:
         self
 
         """
+        message = "Packing map: "+self.name
+        
         if debug:
-            print("Packing map: "+self.name)
+            print(message)
         
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = w3x2lni)
