@@ -6,6 +6,8 @@ Created on Sat Apr 13 03:09:20 2024
 """
 
 import subprocess, shutil, os, configparser
+from lmlParser import lmlParser
+from sharedObjects import trigger, triggerCategory, triggerData
 config = configparser.ConfigParser(interpolation=None)
 config.read("config.ini")
 w3x2lni = config["Settings"]["w3x2lni"]
@@ -27,8 +29,9 @@ class war3Map:
 
         """
         self.w3xpath = mapPath
-        self.lnipath = None
         self.name = mapPath.split('/')[-1][:-4]
+        self.lnipath = None
+        self.trigData = None
         
     def backup(self):
         """
@@ -61,9 +64,12 @@ class war3Map:
         self.lnipath = "Temp\\"+self.name+"_tmp"
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = w3x2lni)
+        
+        self.trigData = triggerData(self.lnipath+'\\trigger')
+        
         return self
     
-    def pack(self, debug = False):
+    def pack(self, debug = False, cleanVars = True):
         """
         Packs the map's lni object back into its original .w3x.
 
@@ -76,6 +82,9 @@ class war3Map:
         
         if debug:
             print(message)
+            
+        if cleanVars:
+            self.trigData.cleanUnusedVars()
         
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = w3x2lni)

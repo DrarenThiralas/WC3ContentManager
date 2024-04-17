@@ -8,79 +8,9 @@ Created on Sat Apr 13 03:00:22 2024
 import configparser, os
 
 from mapData import war3Map
-
-def addIdentations(filePath):
-    """
-    Adds identations to the multiline values in the target .ini file.
-    Otherwise ConfigParser can't read it.
+from sharedObjects import addIdentations, objectData
     
-
-    Parameters
-    ----------
-    filePath : string
-        The path to the .ini file.
-
-    Returns
-    -------
-    None.
-
-    """
-    
-    file = open(filePath, "r")
-    lines = file.readlines()
-    
-    def isHeader(line):
-        return (line[0] == '[' and line[5] == ']')
-    
-    def isComment(line):
-        return (line[0]=='-' and line[1] == '-')
-    
-    if lines[0][0] != " ":
-        newlines = []
-        for line in lines:
-            newline = line
-            if newline.find("=") == -1 and isHeader(newline) == False and isComment(newline) == False:
-                newline = " "+newline
-            newlines.append(newline)
-        file.close()
-        file = open(filePath, "w")
-        file.writelines(newlines)
-        
-    file.close()
-
-class objectData:
-    
-    def __init__(self, packPath):
-        """
-        Initializes a new objectData object.
-        This object represents object editor data in a content pack.
-
-        Parameters
-        ----------
-        packPath : string
-            Path to the content pack folder.
-
-        Returns
-        -------
-        None.
-
-        """
-        self.packPath = packPath
-        
-    def getConfig(self, dataType):
-        
-        sourcePath = self.packPath+"\\"+dataType+".ini"
-        if os.path.exists(sourcePath):
-            
-            sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
-    
-            try:
-                sourceConfig.read(sourcePath)
-            except:
-                addIdentations(sourcePath)
-                sourceConfig.read(sourcePath)
-                
-        return sourceConfig
+class objectPack(objectData):
     
     def apply(self, w3map, dataTypes):
         """
@@ -102,7 +32,7 @@ class objectData:
             try:
                 self.applyType(w3map, dataType)
             except:
-                pack = self.packPath.split('\\')[-1]
+                pack = self.path.split('\\')[-1]
                 print('Failed to apply object data of type '+dataType+' to '+w3map.lnipath+' from '+pack+'. Data may not exist in pack.')
         
     def applyType(self, w3map, dataType):
@@ -122,7 +52,7 @@ class objectData:
 
         """
         
-        sourcePath = self.packPath+"\\"+dataType+".ini"
+        sourcePath = self.path+"\\"+dataType+".ini"
         if os.path.exists(sourcePath):
             
             sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)

@@ -9,27 +9,16 @@ import subprocess, shutil, os
 
 from mapData import war3Map
 from lmlParser import lmlParser, lmlEntry
+from sharedObjects import triggerCategory, triggerData
 
-class triggerCategory:
+
+class triggerPackCategory(triggerCategory):
     
     def __init__(self, path):
-        """
-        Initializes a trigger category.
-        This object is supposed to represent a self-contained group of triggers.
-
-        Parameters
-        ----------
-        path : string
-            Path to the trigger category folder inside the content pack.
-
-        Returns
-        -------
-        None.
-
-        """
-        self.path = path
-        self.name = path.split('\\')[-1]
         
+        triggerCategory.__init__(self, path)
+        self.catalog = self.path+'\\catalog.lml'
+    
     def findIndex(self, w3map):
         """
         Finds the index of itself when applied to the given map.
@@ -90,7 +79,7 @@ class triggerCategory:
         parser = lmlParser()
         mapCatalog = parser.read(mapCatalogPath)
         
-        categoryCatalog = parser.read(self.path+'\\catalog.lml')
+        categoryCatalog = parser.read(self.catalog)
         
         index = self.findIndex(w3map)
         
@@ -103,7 +92,6 @@ class triggerCategory:
             mapCatalog.children[index-1] = categoryCatalog.children[0]
             
         parser.write(mapCatalog, mapCatalogPath)
-        
         
     
     def apply(self, w3map):
@@ -127,38 +115,14 @@ class triggerCategory:
         os.remove(w3map.lnipath+"\\trigger\\"+index+"-"+self.name+"\\catalog.lml")
         
         self.updateCatalog(w3map)
-        
-        
 
-class triggerData:
+class triggerPack(triggerData):
     
-    def __init__(self, packPath):
-        """
-        Initializes a trigger data object.
-        This object represents a content pack's trigger data.
-        It consists of:
-            1. A custom script
-            2. A variable list
-            3. One or several trigger categories
-            
-        Parameters
-        ----------
-        packPath : string
-            Path to the content pack that the trigger data is in.
-
-        Returns
-        -------
-        None.
-
-        """
-        self.packPath = packPath
-        self.customScript = packPath+'\\triggerData\\code.j'
-        self.categories = []
-        for folder in os.scandir(packPath+'\\triggerData\\'):
-            if folder.is_dir():
-                self.categories.append(triggerCategory(packPath+'\\triggerData\\'+folder.name)) 
+    def __init__(self, path):
+        triggerData.__init__(self, path)
+        self.categories = [triggerPackCategory(cat.path) for cat in self.categories]
                 
-    def updateVariables(self, w3map):
+    def updateVariables(self, w3map, clearUnused = True):
         """
         Adds the variables from the content pack
         into the map's variable list.
@@ -174,18 +138,13 @@ class triggerData:
 
         """
         
-
-        
-        variableSourcePath = self.packPath+"\\triggerData\\variable.lml"
-
-        
         variableTargetPath = w3map.lnipath+"\\trigger\\variable.lml"
         
         if os.path.exists(variableTargetPath):
             
             parser = lmlParser()
             
-            variableSource = parser.read(variableSourcePath)
+            variableSource = parser.read(self.varFile)
             variableTarget = parser.read(variableTargetPath)
             
             for entry in variableSource.children:
@@ -199,9 +158,8 @@ class triggerData:
             
         else:
             
-            shutil.copy(variableSourcePath, variableTargetPath)
-        
-        
+            shutil.copy(self.varFile, variableTargetPath)
+                
         
             
     def apply(self, w3map, dataTypes):
@@ -226,13 +184,8 @@ class triggerData:
             shutil.copy(self.customScript, w3map.lnipath+"\\trigger\\code.j")
         
         if "trigger" in dataTypes:
-            triggerCategories = []
-            for obj in os.scandir(self.packPath+"\\triggerData\\"):
-                if obj.is_dir():
-                    triggerCategories.append(triggerCategory(self.packPath+"\\triggerData\\"+obj.name))
-                    
-            for category in triggerCategories:
+            for category in self.categories:
                 category.apply(w3map)
         
-        if "vars" in dataTypes and os.path.exists(self.packPath+"\\triggerData\\variable.lml"):
+        if "vars" in dataTypes and os.path.exists(self.varFile):
            self.updateVariables(w3map)

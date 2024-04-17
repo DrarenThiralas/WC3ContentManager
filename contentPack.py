@@ -8,15 +8,11 @@ Created on Sat Apr 13 03:34:10 2024
 import subprocess, shutil, os
 
 from mapData import war3Map
-from objectData import objectData
-from triggerData import triggerData
+from objectData import objectPack
+from triggerData import triggerPack
 from resourceData import resourceData
 
-
-objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
-triggerTypes = ['trigger', 'customscript', 'vars']
-resourceTypes = ['resource']
-defaultTypes = objTypes + triggerTypes + resourceTypes
+from sharedObjects import objTypes, triggerTypes, resourceTypes, defaultTypes
 
 class contentPack:
     
@@ -41,9 +37,9 @@ class contentPack:
         """
         self.path = path
         self.name = path.split('\\')[-1]
-        self.objData = objectData(path)
+        self.objData = objectPack(path)
         if os.path.exists(path+'\\triggerData'):
-            self.triggerData = triggerData(path)
+            self.triggerData = triggerPack(path+'\\triggerData')
         else:
             self.triggerData = None
         if os.path.exists(path+'\\imp.ini'):
