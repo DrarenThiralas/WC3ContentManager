@@ -179,8 +179,7 @@ class lmlParser:
         file = open(path, 'w')
         entries = lmlContent.children
         for entry in entries:
-            file.write(str(entry))
-        file.write('\n')
+            file.write(str(entry)[1:]+'\n')
         file.close()
         
         
