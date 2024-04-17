@@ -40,7 +40,7 @@ def selectMapFunction():
             mp = war3Map(file)
             mp.unpack()
             shutil.copytree(mp.lnipath+"\\table", "ContentPacks\\"+packName, dirs_exist_ok = True)
-            shutil.copytree(mp.lnipath+"\\resource", "ContentPacks\\"+packName, dirs_exist_ok = True)
+            shutil.copytree(mp.lnipath+"\\resource", "ContentPacks\\"+packName+"\\resource", dirs_exist_ok = True)
             shutil.copytree(mp.lnipath+"\\trigger", "ContentPacks\\"+packName+"\\triggerData", dirs_exist_ok = True)
             newPack = contentPack("ContentPacks\\"+packName)
             populateSettings(newPack)
