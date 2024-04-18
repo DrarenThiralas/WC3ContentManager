@@ -180,9 +180,9 @@ class triggerData:
                 usedVarNames = usedVarNames + trigUsedNames
             
         trigVars = [var for var in variables if var.name in usedVarNames]
-        print ("clean vars: "+str([str(var) for var in variables]))
-        print("\n")
-        print("lml: "+str(variables[2].toLml()))
+        #print ("clean vars: "+str([str(var) for var in variables]))
+        #print("\n")
+        #print("lml: "+str(variables[2].toLml()))
         
         self.setVars(trigVars)
                 
@@ -222,4 +222,21 @@ class objectData:
                 
         return sourceConfig
         
-        
+class resourceData:
+    
+    def __init__(self, path):
+        """
+        Initializes a new resourceData object.
+        This object represents imported asset data.
+
+        Parameters
+        ----------
+        path : string
+            Path to the resource data folder.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.path = path      

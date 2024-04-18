@@ -8,11 +8,8 @@ Created on Sat Apr 13 03:34:10 2024
 import subprocess, shutil, os
 
 from mapData import war3Map
-from objectData import objectPack
-from triggerData import triggerPack
-from resourceData import resourceData
-
 from sharedObjects import objTypes, triggerTypes, resourceTypes, defaultTypes
+from contentPackParts import objectPack, triggerPack, resourcePack
 
 class contentPack:
     
