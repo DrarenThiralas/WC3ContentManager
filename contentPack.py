@@ -40,7 +40,7 @@ class contentPack:
         else:
             self.triggerData = None
         if os.path.exists(path+'\\imp.ini'):
-            self.resourceData = resourceData(path)
+            self.resourceData = resourcePack(path)
         else:
             self.resourceData = None    
             

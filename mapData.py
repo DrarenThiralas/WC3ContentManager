@@ -84,6 +84,7 @@ class war3Map:
             print(message)
             
         if cleanVars:
+            self.trigData = triggerData(self.lnipath+'\\trigger')
             self.trigData.cleanUnusedVars()
         
         cwd = os.getcwd()

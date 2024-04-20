@@ -67,7 +67,7 @@ class windowHelper:
         
         activePacks = []
         
-        layout = self.packSelectorSpace.layout()
+        layout = self.window.packSelectorSpace.layout()
         
         index = layout.count()-1
         while(index >= 0):
