@@ -53,7 +53,8 @@ class mainWindowHelper:
                 checkbox = QCheckBox(str(pack.name))
                 editButton = QPushButton("Edit")
                 packName = checkbox.text()
-                editButton.clicked.connect(lambda x: self.openContentEditor(contentPack("ContentPacks\\"+packName).data))
+                functionFactory = lambda x: lambda: self.openContentEditor(contentPack("ContentPacks\\"+x).data)
+                editButton.clicked.connect(functionFactory(packName))
                 layout.addWidget(checkbox, i, 0)
                 layout.addWidget(editButton, i, 1)
                 i+=1

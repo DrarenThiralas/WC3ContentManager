@@ -6,7 +6,8 @@ Created on Fri Dec  6 15:19:20 2024
 """
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
-from sharedObjects import objTypes, objectData
+import configparser
+from sharedObjects import objTypes
 
 class objectEditorHelper:
     
@@ -33,22 +34,69 @@ class objectEditorHelper:
                     for k in range(len(objectFields)):
                         fields[k].setText(0, objectFields[k])
                         fields[k].setText(2, config[objectIDs[j]][objectFields[k]])
+                        
+    def confirmEdit(self):
+        selection = self.editor.widget.selectedItems()
+        line = self.editor.editLine
+        if len(selection) != 1 or selection[0].childCount() != 0:
+            line.setText("")
+        else:
+            value = line.text()
+            selection[0].setText(2, value)
+        
+    def startEdit(self):
+        selection = self.editor.widget.selectedItems()
+        line = self.editor.editLine
+        if len(selection) != 1:
+            line.setText("")
+        else:
+            line.setText(selection[0].text(2))
+            
+    def applyEdits(self):
+        widget = self.editor.widget
+        topLevelItems = [widget.topLevelItem(i) for i in range(widget.topLevelItemCount()) if widget.topLevelItem(i).childCount()>0]
+        for dataType in topLevelItems: 
+            config = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+            objects = [dataType.child(i) for i in range(dataType.childCount())]
+            for obj in objects:
+                fields = [obj.child(i) for i in range(obj.childCount())]
+                for field in fields:
+                    section = obj.text(0)
+                    option = field.text(0)
+                    if not config.has_section(section):
+                        config.add_section(section)
+                    config[section][option] = field.text(2)
+            self.editor.objectData.setConfig(dataType.text(0), config)
+            
 
 class objectEditor:
     
     def __init__(self, parent):
         self.helper = objectEditorHelper(self)
         self.objectData = None
-        self.initWidget(parent)
+        self.initSpace(parent)
+        self.initWidget()
+        self.initEditLine()
         
     def setObjectData(self, objectData):
         self.objectData = objectData
         self.helper.populateObjects()
         
-    def initWidget(self, parent):
-        self.widget = QTreeWidget(parent=parent)
-        self.widget.setGeometry(20, 80, 1100-40, 780-120-40)
+    def initSpace(self, parent):
+        self.space = QWidget(parent=parent)
+        self.space.setGeometry(20, 80, 1100-40, 780-120-40)
+        
+    def initWidget(self):
+        self.widget = QTreeWidget(parent=self.space)
+        self.widget.setGeometry(20, 20, 1100-80, 780-120-40-80)
         self.widget.setColumnCount(3)
         self.widget.setHeaderLabels(["ID", "Name", "Value"])
-            
+        self.widget.itemSelectionChanged.connect(self.helper.startEdit)
         
+    def initEditLine(self):
+        self.editLine = QLineEdit(parent = self.space)
+        self.editLine.setGeometry(20, 780-120-40-40, 1100-220, 20)
+        self.editButton = QPushButton(parent = self.space)
+        self.editButton.setGeometry(1100-160, 780-120-40-40, 80, 20)
+        self.editButton.setText("Apply")
+        self.editButton.clicked.connect(self.helper.confirmEdit)

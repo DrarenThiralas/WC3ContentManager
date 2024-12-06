@@ -7,8 +7,15 @@ Created on Fri Dec  6 14:30:16 2024
 
 from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
 from PyQt6.QtGui import QIcon
-from contentEditorHelper import contentEditorHelper
 from objectEditor import objectEditor
+
+class contentEditorHelper:
+
+    def __init__(self, editor):
+        self.editor = editor
+        
+    def applyChanges(self):
+        self.editor.objectEditor.helper.applyEdits()
 
 class contentEditorWindow:
     
@@ -18,6 +25,7 @@ class contentEditorWindow:
         self.initWindow(parent)
         self.initMainLayout()
         self.initObjectEditor()
+        self.initOkButton()
         
     def setContent(self, contentContainer):
         self.contentContainer = contentContainer
@@ -27,10 +35,12 @@ class contentEditorWindow:
         self.window = QDialog(parent=parent)
         self.window.setWindowTitle("Content Editor")
         self.window.setGeometry(200, 40, 1100, 780)
-        self.windowOkButton = QPushButton(text = 'Apply', parent=self.window)
+        
+    def initOkButton(self):
+        self.windowOkButton = QPushButton(text = 'OK', parent=self.window)
         self.windowOkButton.setGeometry(1100-80-40, 780-60, 80, 40)
         self.windowOkButton.clicked.connect(self.window.accept)
-        self.window.accepted.connect(self.helper.finalizeContentPack)
+        self.window.accepted.connect(self.helper.applyChanges)
         
     def initMainLayout(self):
         self.tabLayout = QHBoxLayout()

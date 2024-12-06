@@ -245,6 +245,13 @@ class objectData:
                 sourceConfig.read(sourcePath)
                 
         return sourceConfig
+    
+    def setConfig(self, dataType, targetConfig):
+        
+        targetPath = self.path+"\\"+dataType+".ini"
+        with open(targetPath, 'w') as configfile:
+            targetConfig.write(configfile)
+            configfile.close()
         
 class resourceData:
     
