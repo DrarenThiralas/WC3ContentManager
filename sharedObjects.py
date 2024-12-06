@@ -16,6 +16,18 @@ class constants:
         path = config["Settings"]["w3x2lni"]
         return path
     
+    def mpqeditor():
+        config = configparser.ConfigParser(interpolation=None)
+        config.read("config.ini")
+        path = config["Settings"]["mpqedit"]
+        return path
+
+    def war3path():  
+        config = configparser.ConfigParser(interpolation=None)
+        config.read("config.ini")
+        path = config["Settings"]["war3"]
+        return path
+    
     objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
     triggerTypes = ['trigger', 'customscript', 'vars']
     resourceTypes = ['resource']

@@ -17,29 +17,64 @@ class mainWindowHelper:
         self.window = window
         
     def checkConfig(self):
-        configOk = True
+        configExists = True
+        war3Exists = True
+        w3x2lniExists = True
+        MPQEditorExists = True
+        
         configPath = "config.ini"
         if os.path.exists(configPath):
             config = configparser.ConfigParser(interpolation=None)
-            config.read("config.ini")
+            config.read(configPath)
+            
             if config.has_option("Settings", "w3x2lni"):
                 w3x2lni = config["Settings"]["w3x2lni"]+"\\w2l.exe"
+                if not os.path.exists(w3x2lni):
+                    w3x2lniExists = False
             else:
-                configOk = False
-            if not os.path.exists(w3x2lni):
-                configOk = False
+                w3x2lniExists = False
+                
+            if config.has_option("Settings", "mpqedit"):
+                MPQEdit = config["Settings"]["mpqedit"]+"\\MPQEditor.exe"
+                if not os.path.exists(MPQEdit):
+                    MPQEditorExists = False
+            else:
+                MPQEditorExists = False
+                
+            if config.has_option("Settings", "war3"):
+                war3Path = config["Settings"]["war3"]+"\\war3.exe"
+                if not os.path.exists(war3Path):
+                    war3Exists = False
+            else:
+                war3Exists = False
+                
         else:
-            configOk = False
+            configExists = False
+            war3Exists = False
+            w3x2lniExists = False
+            MPQEditorExists = False
             
-        if not configOk:
-            folder = QFileDialog.getExistingDirectory(self.window.window, "w3x2lni not found. Select your w3x2lni installation path.")  
-            targetConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
-            targetConfig.add_section("Settings")
-            targetConfig["Settings"]["w3x2lni"] = folder
+        newConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+            
+        if configExists:
+            newConfig.read(configPath)
+        if not newConfig.has_section("Settings"):
+            newConfig.add_section("Settings")
+            
+        def folderSelect(tooltip, setting):
+            folder = QFileDialog.getExistingDirectory(self.window.window, tooltip)  
+            newConfig["Settings"][setting] = folder
             with open(configPath, 'w') as configfile:
-                targetConfig.write(configfile)
+                newConfig.write(configfile)
                 configfile.close()
             self.checkConfig()
+            
+        if not war3Exists:
+            folderSelect("Warcraft 3 not found. Select your Warcraft 3 folder.", "war3")  
+        elif not w3x2lniExists:
+            folderSelect("w3x2lni not found. Select your w3x2lni folder.", "w3x2lni")
+        elif not MPQEditorExists:
+            folderSelect("Ladik's MPQ Editor not found. Select your MPQ Editor folder.", "mpqedit")
             
         
     def selectMapsFunction(self):
