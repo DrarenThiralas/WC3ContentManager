@@ -52,6 +52,29 @@ def addIdentations(filePath):
         
     file.close()
     
+class contentContainer:
+    
+    def __init__(self, path):
+        """
+        Initializes a generic content container object that can be
+        used to store object, trigger, and resource data together.
+        Used by both maps and content packs.
+
+        Parameters
+        ----------
+        path : string
+            Path to the folder where the content is stored.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.path = path
+        self.objData = None
+        self.triggerData = None
+        self.resourceData = None
+    
 class triggerVariable:
     
     def __init__(self, lml):
@@ -210,6 +233,7 @@ class objectData:
     def getConfig(self, dataType):
         
         sourcePath = self.path+"\\"+dataType+".ini"
+        sourceConfig = None
         if os.path.exists(sourcePath):
             
             sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
@@ -239,4 +263,4 @@ class resourceData:
         None.
 
         """
-        self.path = path      
+        self.path = path   

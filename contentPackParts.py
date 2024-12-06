@@ -114,38 +114,26 @@ class objectPack(objectData):
         None.
 
         """
+            
+        sourceConfig = self.getConfig(dataType)
         
-        sourcePath = self.path+"\\"+dataType+".ini"
-        if os.path.exists(sourcePath):
-            
-            sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
-    
-            try:
-                sourceConfig.read(sourcePath)
-            except:
-                addIdentations(sourcePath)
-                sourceConfig.read(sourcePath)
+        targetConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+        targetPath = w3map.lnipath+"\\table\\"+dataType+".ini"
+        try: 
+            targetConfig.read(targetPath)
+        except:
+            addIdentations(targetPath)
+            targetConfig.read(targetPath)
             
             
-            #print(sourceConfig.sections())
+        sourceSections = sourceConfig.sections()
             
-            targetConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
-            targetPath = w3map.lnipath+"\\table\\"+dataType+".ini"
-            try: 
-                targetConfig.read(targetPath)
-            except:
-                addIdentations(targetPath)
-                targetConfig.read(targetPath)
-            
-            
-            dataObjectsSource = sourceConfig.sections()
-            
-            for obj in dataObjectsSource:
-                targetConfig[obj] = sourceConfig[obj]
+        for obj in sourceSections:
+            targetConfig[obj] = sourceConfig[obj]
                 
-            with open(targetPath, 'w') as configfile:
-                targetConfig.write(configfile)
-                configfile.close()
+        with open(targetPath, 'w') as configfile:
+            targetConfig.write(configfile)
+            configfile.close()
 
 class triggerPackCategory(triggerCategory):
     
@@ -157,7 +145,7 @@ class triggerPackCategory(triggerCategory):
     def findIndex(self, w3map):
         """
         Finds the index of itself when applied to the given map.
-        This is needed in order to add triggers to map that already have triggers.
+        This is needed in order to add triggers to maps that already have triggers.
 
         Parameters
         ----------

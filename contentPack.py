@@ -8,7 +8,7 @@ Created on Sat Apr 13 03:34:10 2024
 import subprocess, shutil, os
 
 from mapData import war3Map
-from sharedObjects import objTypes, triggerTypes, resourceTypes, defaultTypes
+from sharedObjects import objTypes, triggerTypes, resourceTypes, defaultTypes, contentContainer
 from contentPackParts import objectPack, triggerPack, resourcePack
 
 class contentPack:
@@ -34,15 +34,16 @@ class contentPack:
         """
         self.path = path
         self.name = path.split('\\')[-1]
-        self.objData = objectPack(path)
+        self.data = contentContainer(path)
+        self.data.objData = objectPack(path)
         if os.path.exists(path+'\\triggerData'):
-            self.triggerData = triggerPack(path+'\\triggerData')
+            self.data.triggerData = triggerPack(path+'\\triggerData')
         else:
-            self.triggerData = None
+            self.data.triggerData = None
         if os.path.exists(path+'\\imp.ini'):
-            self.resourceData = resourcePack(path)
+            self.data.resourceData = resourcePack(path)
         else:
-            self.resourceData = None    
+            self.data.resourceData = None    
             
     def getObjConfDict(self):
         """
@@ -58,7 +59,7 @@ class contentPack:
         confDict = dict()
         for Type in objTypes:
             if os.path.exists(self.path+"\\"+Type+".ini"):
-                confDict[Type]=self.objData.getConfig(Type)
+                confDict[Type]=self.data.objData.getConfig(Type)
         return confDict
         
     def apply(self, w3map, dataTypes=defaultTypes):
@@ -81,20 +82,14 @@ class contentPack:
 
         """
         
-        objectTypesArg = []
-        triggerTypesArg = []
-        
-        for Type in dataTypes:
-            if Type in objTypes:
-                objectTypesArg.append(Type)
-            if Type in triggerTypes:
-                triggerTypesArg.append(Type)
+        objectTypesArg = [Type for Type in dataTypes if Type in objTypes]
+        triggerTypesArg = [Type for Type in dataTypes if Type in triggerTypes]
             
-        self.objData.apply(w3map, objectTypesArg)
-        if self.triggerData != None:
-            self.triggerData.apply(w3map, triggerTypesArg)
-        if self.resourceData != None:
-            self.resourceData.apply(w3map)
+        self.data.objData.apply(w3map, objectTypesArg)
+        if self.data.triggerData != None:
+            self.data.triggerData.apply(w3map, triggerTypesArg)
+        if self.data.resourceData != None:
+            self.data.resourceData.apply(w3map)
             
         return w3map
         

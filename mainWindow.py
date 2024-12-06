@@ -7,16 +7,19 @@ Created on Thu Apr 18 06:24:31 2024
 
 from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout
 from PyQt6.QtGui import QIcon
-from windowHelper import windowHelper
+from mainWindowHelper import mainWindowHelper
+
+from contentEditorWindow import contentEditorWindow
 
 class mainWindow:
     
     def __init__(self):
-        self.helper = windowHelper(self)
+        self.helper = mainWindowHelper(self)
         self.initWindow()
         self.initMapSelector()
         self.initPackSelector()
         self.initResMsg()
+        self.initContentEditor()
         self.initExecuteButton()
         self.initExportButton()
         self.initExportSettings()
@@ -29,7 +32,7 @@ class mainWindow:
         self.window.setWindowTitle("WCIII Content Manager")
         self.icon = QIcon("w3cm.ico")
         self.window.setWindowIcon(self.icon)
-        self.window.setGeometry(100, 100, 900, 800)
+        self.window.setGeometry(200, 40, 900, 800)
         self.header = QLabel("<h1>Warcraft III Content Manager</h1>", parent=self.window)
         self.header.move(60, 15)
         
@@ -43,8 +46,16 @@ class mainWindow:
         
     def initPackSelector(self):
         
+        self.packSelectorHeader = QLabel(parent=self.window)
+        self.packSelectorHeader.setGeometry(40, 120, 820, 40)
+        
         self.packSelectorSpace = QWidget(parent=self.window)
         geometry, layout = self.helper.importContentPacks()
+        
+        if geometry[3] > 0:
+            self.packSelectorHeader.setText("Content Packs:")
+        else:
+            self.packSelectorHeader.setText("No Content Packs Found!")
 
         self.packSelectorSpace.setGeometry(*geometry)
         self.packSelectorSpace.setLayout(layout)
@@ -59,6 +70,10 @@ class mainWindow:
         self.executeButton = QPushButton(text='Apply Content Packs', parent=self.window)
         self.executeButton.setGeometry(340-220, 720, 220, 40)
         self.executeButton.clicked.connect(self.helper.executeFunction)
+        
+    def initContentEditor(self):
+        
+        self.contentEditor = contentEditorWindow(self.window)
         
     def initExportButton(self):
         

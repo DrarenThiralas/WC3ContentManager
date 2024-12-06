@@ -5,13 +5,13 @@ Created on Thu Apr 18 06:25:00 2024
 @author: maxer
 """
 import os, shutil
-from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel
+from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel, QPushButton
 from PyQt6.QtCore import Qt
 from contentPack import contentPack
 from mapData import war3Map
 from sharedObjects import objTypes
 
-class windowHelper:
+class mainWindowHelper:
     
     def __init__(self, window):
         self.window = window
@@ -43,12 +43,19 @@ class windowHelper:
         
         layout = QGridLayout()
         
+        if not os.path.exists("ContentPacks\\"):
+            os.makedirs("ContentPacks\\")
+        
         contentPacks = os.scandir("ContentPacks\\")
         i = 0
         for pack in contentPacks:
             if pack.is_dir():
                 checkbox = QCheckBox(str(pack.name))
+                editButton = QPushButton("Edit")
+                packName = checkbox.text()
+                editButton.clicked.connect(lambda x: self.openContentEditor(contentPack("ContentPacks\\"+packName).data))
                 layout.addWidget(checkbox, i, 0)
+                layout.addWidget(editButton, i, 1)
                 i+=1
                 
         geometry = (40, 140, 820, 40*i)
@@ -124,6 +131,11 @@ class windowHelper:
         progressDialog.setValue(progressTotal)
             
         self.window.resultMsg.setText("Content packs applied!")
+        
+    def openContentEditor(self, content):
+        
+        self.window.contentEditor.setContent(content)
+        self.window.contentEditor.window.open()
         
     def selectMapFunction(self):
         

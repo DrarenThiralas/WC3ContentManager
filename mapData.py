@@ -7,7 +7,7 @@ Created on Sat Apr 13 03:09:20 2024
 
 import subprocess, shutil, os, configparser
 from lmlParser import lmlParser
-from sharedObjects import trigger, triggerCategory, triggerData
+from sharedObjects import trigger, triggerCategory, triggerData, objectData, resourceData, contentContainer
 config = configparser.ConfigParser(interpolation=None)
 config.read("config.ini")
 w3x2lni = config["Settings"]["w3x2lni"]
@@ -31,7 +31,7 @@ class war3Map:
         self.w3xpath = mapPath
         self.name = mapPath.split('/')[-1][:-4]
         self.lnipath = None
-        self.trigData = None
+        self.data = None
         
     def backup(self):
         """
@@ -65,7 +65,10 @@ class war3Map:
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = w3x2lni)
         
-        self.trigData = triggerData(self.lnipath+'\\trigger')
+        self.data = contentContainer(self.lnipath)
+        self.data.triggerData = triggerData(self.lnipath+'\\trigger')
+        self.data.objData = objectData(self.lnipath)
+        self.data.resourceData = resourceData(self.lnipath)
         
         return self
     
@@ -84,8 +87,8 @@ class war3Map:
             print(message)
             
         if cleanVars:
-            self.trigData = triggerData(self.lnipath+'\\trigger')
-            self.trigData.cleanUnusedVars()
+            self.data.trigData = triggerData(self.lnipath+'\\trigger')
+            self.data.trigData.cleanUnusedVars()
         
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = w3x2lni)
