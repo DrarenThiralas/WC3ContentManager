@@ -16,6 +16,7 @@ class mainWindow:
     def __init__(self):
         self.helper = mainWindowHelper(self)
         self.initWindow()
+        self.helper.checkConfig()
         self.initMapSelector()
         self.initPackSelector()
         self.initResMsg()

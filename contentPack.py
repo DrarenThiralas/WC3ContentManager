@@ -8,7 +8,7 @@ Created on Sat Apr 13 03:34:10 2024
 import subprocess, shutil, os
 
 from mapData import war3Map
-from sharedObjects import objTypes, triggerTypes, resourceTypes, defaultTypes, contentContainer
+from sharedObjects import constants, contentContainer
 from contentPackParts import objectPack, triggerPack, resourcePack
 
 class contentPack:
@@ -57,12 +57,12 @@ class contentPack:
 
         """
         confDict = dict()
-        for Type in objTypes:
+        for Type in constants.objTypes:
             if os.path.exists(self.path+"\\"+Type+".ini"):
                 confDict[Type]=self.data.objData.getConfig(Type)
         return confDict
         
-    def apply(self, w3map, dataTypes=defaultTypes):
+    def apply(self, w3map, dataTypes=constants.defaultTypes):
         """
         Applies the specified data types from
         the content pack to the target map.
@@ -82,8 +82,8 @@ class contentPack:
 
         """
         
-        objectTypesArg = [Type for Type in dataTypes if Type in objTypes]
-        triggerTypesArg = [Type for Type in dataTypes if Type in triggerTypes]
+        objectTypesArg = [Type for Type in dataTypes if Type in constants.objTypes]
+        triggerTypesArg = [Type for Type in dataTypes if Type in constants.triggerTypes]
             
         self.data.objData.apply(w3map, objectTypesArg)
         if self.data.triggerData != None:

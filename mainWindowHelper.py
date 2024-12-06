@@ -4,17 +4,43 @@ Created on Thu Apr 18 06:25:00 2024
 
 @author: maxer
 """
-import os, shutil
+import os, shutil, configparser
 from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel, QPushButton
 from PyQt6.QtCore import Qt
 from contentPack import contentPack
 from mapData import war3Map
-from sharedObjects import objTypes
+from sharedObjects import constants
 
 class mainWindowHelper:
     
     def __init__(self, window):
         self.window = window
+        
+    def checkConfig(self):
+        configOk = True
+        configPath = "config.ini"
+        if os.path.exists(configPath):
+            config = configparser.ConfigParser(interpolation=None)
+            config.read("config.ini")
+            if config.has_option("Settings", "w3x2lni"):
+                w3x2lni = config["Settings"]["w3x2lni"]+"\\w2l.exe"
+            else:
+                configOk = False
+            if not os.path.exists(w3x2lni):
+                configOk = False
+        else:
+            configOk = False
+            
+        if not configOk:
+            folder = QFileDialog.getExistingDirectory(self.window.window, "w3x2lni not found. Select your w3x2lni installation path.")  
+            targetConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+            targetConfig.add_section("Settings")
+            targetConfig["Settings"]["w3x2lni"] = folder
+            with open(configPath, 'w') as configfile:
+                targetConfig.write(configfile)
+                configfile.close()
+            self.checkConfig()
+            
         
     def selectMapsFunction(self):
         """
@@ -179,7 +205,7 @@ class mainWindowHelper:
         while(index >= 0):
             myWidget = layout.itemAt(index).widget()
             if myWidget.isChecked():
-                Type = objTypes[layout.getItemPosition(index)[1]]
+                Type = constants.objTypes[layout.getItemPosition(index)[1]]
                 if Type not in activeSettings:
                     activeSettings[Type] = []
                 activeSettings[Type].append(contentPack("ContentPacks\\"+myWidget.text()))

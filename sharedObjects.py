@@ -8,10 +8,18 @@ Created on Wed Apr 17 04:50:04 2024
 import os, shutil, configparser
 from lmlParser import lmlParser, lmlLine, lmlEntry
 
-objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
-triggerTypes = ['trigger', 'customscript', 'vars']
-resourceTypes = ['resource']
-defaultTypes = objTypes + triggerTypes + resourceTypes
+class constants:
+    
+    def w3x2lni():
+        config = configparser.ConfigParser(interpolation=None)
+        config.read("config.ini")
+        path = config["Settings"]["w3x2lni"]
+        return path
+    
+    objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
+    triggerTypes = ['trigger', 'customscript', 'vars']
+    resourceTypes = ['resource']
+    defaultTypes = objTypes + triggerTypes + resourceTypes
 
 def addIdentations(filePath):
     """

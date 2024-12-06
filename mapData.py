@@ -7,10 +7,7 @@ Created on Sat Apr 13 03:09:20 2024
 
 import subprocess, shutil, os, configparser
 from lmlParser import lmlParser
-from sharedObjects import trigger, triggerCategory, triggerData, objectData, resourceData, contentContainer
-config = configparser.ConfigParser(interpolation=None)
-config.read("config.ini")
-w3x2lni = config["Settings"]["w3x2lni"]
+from sharedObjects import trigger, triggerCategory, triggerData, objectData, resourceData, contentContainer, constants
 
 class war3Map:
     
@@ -63,7 +60,7 @@ class war3Map:
         self.backup()
         self.lnipath = "Temp\\"+self.name+"_tmp"
         cwd = os.getcwd()
-        subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = w3x2lni)
+        subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.w3x2lni())
         
         self.data = contentContainer(self.lnipath)
         self.data.triggerData = triggerData(self.lnipath+'\\trigger')
@@ -91,5 +88,5 @@ class war3Map:
             self.data.trigData.cleanUnusedVars()
         
         cwd = os.getcwd()
-        subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = w3x2lni)
+        subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = constants.w3x2lni())
         return self

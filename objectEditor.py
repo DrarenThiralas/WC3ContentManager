@@ -6,8 +6,9 @@ Created on Fri Dec  6 15:19:20 2024
 """
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
+from PyQt6.QtCore import Qt
 import configparser
-from sharedObjects import objTypes
+from sharedObjects import constants
 
 class objectEditorHelper:
     
@@ -16,10 +17,10 @@ class objectEditorHelper:
         
     def populateObjects(self):
         self.editor.widget.clear()
-        objItems = [QTreeWidgetItem(self.editor.widget) for objType in objTypes]
+        objItems = [QTreeWidgetItem(self.editor.widget) for objType in constants.objTypes]
         for i in range(len(objItems)):
             objItem = objItems[i]
-            objType = objTypes[i]
+            objType = constants.objTypes[i]
             objItem.setText(0, objType)
             config = self.editor.objectData.getConfig(objType)
             if not config == None:
@@ -71,10 +72,10 @@ class objectEditorHelper:
 
 class objectEditor:
     
-    def __init__(self, parent):
+    def __init__(self):
         self.helper = objectEditorHelper(self)
         self.objectData = None
-        self.initSpace(parent)
+        self.initSpace()
         self.initWidget()
         self.initEditLine()
         
@@ -82,21 +83,22 @@ class objectEditor:
         self.objectData = objectData
         self.helper.populateObjects()
         
-    def initSpace(self, parent):
-        self.space = QWidget(parent=parent)
-        self.space.setGeometry(20, 80, 1100-40, 780-120-40)
+    def initSpace(self):
+        self.space = QWidget()
+        self.space.setGeometry(20, 20, 1100-40, 780-120-40)
         
     def initWidget(self):
         self.widget = QTreeWidget(parent=self.space)
-        self.widget.setGeometry(20, 20, 1100-80, 780-120-40-80)
+        self.widget.setGeometry(20, 20, 1100-80-40, 780-120-40-80)
         self.widget.setColumnCount(3)
         self.widget.setHeaderLabels(["ID", "Name", "Value"])
         self.widget.itemSelectionChanged.connect(self.helper.startEdit)
         
     def initEditLine(self):
         self.editLine = QLineEdit(parent = self.space)
-        self.editLine.setGeometry(20, 780-120-40-40, 1100-220, 20)
+        self.editLine.setGeometry(20, 780-120-40-40, 1100-120-200, 20)
         self.editButton = QPushButton(parent = self.space)
-        self.editButton.setGeometry(1100-160, 780-120-40-40, 80, 20)
+        self.editButton.setGeometry(1100-120-120, 780-120-40-40, 60, 20)
         self.editButton.setText("Apply")
         self.editButton.clicked.connect(self.helper.confirmEdit)
+        self.editButton.setShortcut(Qt.Key.Key_Enter)

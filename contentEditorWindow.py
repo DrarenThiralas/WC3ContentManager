@@ -5,7 +5,7 @@ Created on Fri Dec  6 14:30:16 2024
 @author: Common
 """
 
-from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QTabWidget
 from PyQt6.QtGui import QIcon
 from objectEditor import objectEditor
 
@@ -43,15 +43,9 @@ class contentEditorWindow:
         self.window.accepted.connect(self.helper.applyChanges)
         
     def initMainLayout(self):
-        self.tabLayout = QHBoxLayout()
-        self.tabSpace = QWidget(parent=self.window)
-        self.tabSpace.setGeometry(20, 20, 1100-40, 40)
-        self.tabNames = ['Objects', 'Triggers', 'Resources']
-        for name in self.tabNames:
-            button = QPushButton(text = name)
-            self.tabLayout.addWidget(button)
-        self.tabSpace.setLayout(self.tabLayout)
-        self.activeTabId = 0
+        self.tabSpace = QTabWidget(parent=self.window)
+        self.tabSpace.setGeometry(20, 20, 1100-40, 780-120)
         
     def initObjectEditor(self):
-        self.objectEditor = objectEditor(self.window)
+        self.objectEditor = objectEditor()
+        self.tabSpace.addTab(self.objectEditor.space, "Objects")
