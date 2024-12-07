@@ -107,7 +107,11 @@ class mainWindowHelper:
 
     def prepareData(self):
 
-        dataPath = "Data\\"
+        self.prepareBaseObjectData()
+
+    def prepareBaseObjectData(self):
+
+        self.a = 1
 
 
     def selectMapsFunction(self):

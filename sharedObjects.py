@@ -9,25 +9,28 @@ import os, shutil, configparser
 from lmlParser import lmlParser, lmlLine, lmlEntry
 
 class constants:
-    
+
     def w3x2lni():
         config = configparser.ConfigParser(interpolation=None)
         config.read("config.ini")
         path = config["Settings"]["w3x2lni"]
         return path
-    
+
     def mpqeditor():
         config = configparser.ConfigParser(interpolation=None)
         config.read("config.ini")
         path = config["Settings"]["mpqedit"]
         return path
 
-    def war3path():  
+    def war3path():
         config = configparser.ConfigParser(interpolation=None)
         config.read("config.ini")
         path = config["Settings"]["war3"]
         return path
-    
+
+    def getBaseObjectData():
+        return objectData("Data\\BaseObjectData\\")
+
     objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
     triggerTypes = ['trigger', 'customscript', 'vars']
     resourceTypes = ['resource']
@@ -37,7 +40,7 @@ def addIdentations(filePath):
     """
     Adds identations to the multiline values in the target .ini file.
     Otherwise ConfigParser can't read it.
-    
+
 
     Parameters
     ----------
@@ -49,16 +52,16 @@ def addIdentations(filePath):
     None.
 
     """
-    
+
     file = open(filePath, "r")
     lines = file.readlines()
-    
+
     def isHeader(line):
         return (line[0] == '[' and line[5] == ']')
-    
+
     def isComment(line):
         return (line[0]=='-' and line[1] == '-')
-    
+
     if lines[0][0] != " ":
         newlines = []
         for line in lines:
@@ -69,11 +72,11 @@ def addIdentations(filePath):
         file.close()
         file = open(filePath, "w")
         file.writelines(newlines)
-        
+
     file.close()
-    
+
 class contentContainer:
-    
+
     def __init__(self, path):
         """
         Initializes a generic content container object that can be
@@ -94,9 +97,9 @@ class contentContainer:
         self.objData = None
         self.triggerData = None
         self.resourceData = None
-    
+
 class triggerVariable:
-    
+
     def __init__(self, lml):
         """
         Initializes a triggerVariable object.
@@ -112,7 +115,7 @@ class triggerVariable:
         None.
 
         """
-        
+
         self.name = lml.name.split(":")[0]
         self.type = lml.name.split(":")[1][1:]
         self.initial = None
@@ -122,22 +125,22 @@ class triggerVariable:
                 self.initial = child.name.split(":")[1][1:]
             if child.name[:5] == "Array":
                 self.array = child.name.split(":")[1][1:]
-                
+
     def toLml(self):
-        
+
         entry = lmlEntry(self.name+": "+self.type, [])
         if self.initial != None:
             entry.children.append(lmlEntry("Def   : "+self.initial, []))
         if self.array != None:
             entry.children.append(lmlEntry("Array : "+self.array, []))
-            
+
         return entry
-    
+
     def __str__(self):
         return self.name+": "+self.type
 
 class trigger:
-    
+
     def __init__(self, path):
         """
         Initializes a trigger object, which represents a single trigger.
@@ -154,7 +157,7 @@ class trigger:
         """
         self.path = path
         self.name = path.split('\\')[-1][:-4]
-        
+
     def getUsedVarNames(self):
         """
         Returns returns a list of variable names used in the trigger.
@@ -165,24 +168,24 @@ class trigger:
             A list of variable names used in the trigger.
 
         """
-        
+
         usedVars = []
-        
+
         file = open(self.path, 'r')
         lines = file.readlines()
         file.close()
-        
+
         for line in lines:
             ln = lmlLine(line).name
             if ln[:3] == "Var" or ln[:5] == "Array":
                 usedVars.append(ln.split(":")[-1][1:])
-                
+
         #print("used vars for "+self.name+": "+str(usedVars))
         return usedVars
-            
+
 
 class triggerCategory:
-    
+
     def __init__(self, path):
         """
         Initializes a trigger category.
@@ -201,11 +204,11 @@ class triggerCategory:
         self.path = path
         self.name = path.split('\\')[-1]
         self.triggers = [trigger(self.path+'\\'+f.name) for f in os.scandir(self.path) if f.name != 'catalog.lml']
-        
 
-        
+
+
 class triggerData:
-    
+
     def __init__(self, path):
         """
         Initializes a trigger data object.
@@ -214,7 +217,7 @@ class triggerData:
             1. A custom script
             2. A variable list
             3. One or several trigger categories
-            
+
         Parameters
         ----------
         path : string
@@ -229,46 +232,46 @@ class triggerData:
         self.customScript = self.path+'\\code.j'
         self.varFile = self.path+"\\variable.lml"
         self.categories = [triggerCategory(self.path+'\\'+folder.name) for folder in os.scandir(self.path) if folder.is_dir()]
-        
+
     def getVars(self):
-        
+
         allVars = []
-        
+
         if os.path.exists(self.varFile):
             parser = lmlParser()
             variableTarget = parser.read(self.varFile)
             allVars = [triggerVariable(x) for x in variableTarget.children]
-            
+
         #print ("vars: "+str([str(var) for var in allVars]))
         return allVars
-    
+
     def setVars(self, trigVars):
-        
+
         parser = lmlParser()
         variableTarget = lmlEntry("root", [var.toLml() for var in trigVars])
         parser.write(variableTarget, self.varFile)
-    
+
     def cleanUnusedVars(self):
-                        
+
         variables = self.getVars()
-           
+
         usedVarNames = []
         for cat in self.categories:
             for trig in cat.triggers:
                 trigUsedNames = trig.getUsedVarNames()
                 usedVarNames = usedVarNames + trigUsedNames
-            
+
         trigVars = [var for var in variables if var.name in usedVarNames]
         #print ("clean vars: "+str([str(var) for var in variables]))
         #print("\n")
         #print("lml: "+str(variables[2].toLml()))
-        
+
         self.setVars(trigVars)
-                
-            
-                
+
+
+
 class objectData:
-    
+
     def __init__(self, path):
         """
         Initializes a new objectData object.
@@ -285,32 +288,91 @@ class objectData:
 
         """
         self.path = path
-        
+
+    def clearType(self, dataType):
+        if self.getHasType(dataType):
+            os.remove(self.getTypeFile(dataType))
+
+    def clear(self):
+        for Type in self.getTypeList():
+            self.clearType(Type)
+
+    def getTypeFile(self, dataType):
+        return self.path+"\\"+dataType+".ini"
+
+    def getHasType(self, dataType):
+        return os.path.exists(self.getTypeFile(dataType))
+
+    def getTypeList(self):
+        return [Type for Type in constants.objTypes if self.getHasType(Type)]
+
     def getConfig(self, dataType):
-        
+
         sourcePath = self.path+"\\"+dataType+".ini"
         sourceConfig = None
         if os.path.exists(sourcePath):
-            
+
             sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
-    
+
             try:
                 sourceConfig.read(sourcePath)
             except:
                 addIdentations(sourcePath)
                 sourceConfig.read(sourcePath)
-                
+
         return sourceConfig
-    
+
     def setConfig(self, dataType, targetConfig):
-        
+
         targetPath = self.path+"\\"+dataType+".ini"
         with open(targetPath, 'w') as configfile:
             targetConfig.write(configfile)
             configfile.close()
-        
+
+    def mergeDataType(self, newData, dataType):
+
+        config = [self.getConfig(dataType), newData.getConfig(dataType)]
+
+        for section in config[1].sections():
+            if not config[0].has_section(section):
+                config[0].add_section(section)
+
+            for option in config[1].options(section):
+                config[0].set(section, option, config[1][section][option])
+
+        self.setConfig(dataType, config[0])
+
+    def mergeData(self, newData):
+        for dataType in newData.getTypeList():
+            self.mergeDataType(newData, dataType)
+
+    def subtractDataType(self, dataToRemove, dataType):
+
+        config = [self.getConfig(dataType), dataToRemove.getConfig(dataType)]
+
+        for section in config[1].sections():
+            for option in config[1].options(section):
+                if config[0].has_option(option):
+                    config[0].remove_option(section, option)
+                    if len(config[0].options(section)) == 0:
+                        config[0].remove_section(section)
+
+        self.setConfig(dataType, config[0])
+
+    def subtractData(self, dataToRemove):
+
+        for dataType in self.getTypeList():
+            if dataType in dataToRemove.getTypeList():
+                self.subtractDataType(dataToRemove, dataType)
+
+    def setData(self, data):
+        self.clear()
+        self.mergeData(data)
+
+
+
 class resourceData:
-    
+
     def __init__(self, path):
         """
         Initializes a new resourceData object.
@@ -326,4 +388,4 @@ class resourceData:
         None.
 
         """
-        self.path = path   
+        self.path = path

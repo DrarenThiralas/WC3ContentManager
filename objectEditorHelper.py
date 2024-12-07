@@ -7,12 +7,21 @@ Created on Sat Dec  7 15:39:13 2024
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
 import configparser
-from sharedObjects import constants
+from sharedObjects import constants, objectData
 
 class objectEditorHelper:
 
     def __init__(self, editor):
         self.editor = editor
+        self.workData = objectData("Work\\ObjectEditor\\")
+        self.clearObjectData()
+
+    def clearObjectData(self):
+        self.workData.clear()
+        self.workData.mergeData(constants.getBaseObjectData())
+
+    def addObjectData(self, objData):
+        self.workData.mergeData(objData)
 
     def populateObjects(self):
         self.editor.widget.clear()
@@ -21,7 +30,7 @@ class objectEditorHelper:
             objItem = objItems[i]
             objType = constants.objTypes[i]
             objItem.setText(0, objType)
-            config = self.editor.objectData.getConfig(objType)
+            config = self.workData.getConfig(objType)
             if not config == None:
                 objectIDs = config.sections()
                 objectNames = [config[obj]["Name"] if config.has_option(obj, "Name") else "" for obj in objectIDs]
@@ -66,4 +75,6 @@ class objectEditorHelper:
                     if not config.has_section(section):
                         config.add_section(section)
                     config[section][option] = field.text(2)
-            self.editor.objectData.setConfig(dataType.text(0), config)
+            self.workData.setConfig(dataType.text(0), config)
+        self.workData.subtractData(constants.getBaseObjectData())
+        self.editor.objectData.setData(self.workData)
