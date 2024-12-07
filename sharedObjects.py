@@ -98,6 +98,20 @@ class contentContainer:
 class triggerVariable:
     
     def __init__(self, lml):
+        """
+        Initializes a triggerVariable object.
+        This object represents a trigger variable.
+
+        Parameters
+        ----------
+        lml : string
+            lml entry describing the variable.
+
+        Returns
+        -------
+        None.
+
+        """
         
         self.name = lml.name.split(":")[0]
         self.type = lml.name.split(":")[1][1:]
@@ -125,10 +139,32 @@ class triggerVariable:
 class trigger:
     
     def __init__(self, path):
+        """
+        Initializes a trigger object, which represents a single trigger.
+
+        Parameters
+        ----------
+        path : string
+            Path to the trigger file.
+
+        Returns
+        -------
+        None.
+
+        """
         self.path = path
         self.name = path.split('\\')[-1][:-4]
         
     def getUsedVarNames(self):
+        """
+        Returns returns a list of variable names used in the trigger.
+
+        Returns
+        -------
+        usedVars : list of strings
+            A list of variable names used in the trigger.
+
+        """
         
         usedVars = []
         

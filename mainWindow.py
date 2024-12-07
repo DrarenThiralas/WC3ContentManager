@@ -14,6 +14,14 @@ from contentEditorWindow import contentEditorWindow
 class mainWindow:
     
     def __init__(self):
+        """
+        Initializes the program's main window.
+
+        Returns
+        -------
+        None.
+
+        """
         self.helper = mainWindowHelper(self)
         self.initWindow()
         self.helper.checkConfig()
