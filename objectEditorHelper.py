@@ -13,7 +13,7 @@ class objectEditorHelper:
 
     def __init__(self, editor):
         self.editor = editor
-        self.workData = objectData("Work\\ObjectEditor\\")
+        self.workData = objectData("Work\\ObjectEditor")
         self.clearObjectData()
 
     def clearObjectData(self):
@@ -22,6 +22,10 @@ class objectEditorHelper:
 
     def addObjectData(self, objData):
         self.workData.mergeData(objData)
+
+    def setObjectData(self, objData):
+        self.clearObjectData()
+        self.addObjectData(objData)
 
     def populateObjects(self):
         self.editor.widget.clear()

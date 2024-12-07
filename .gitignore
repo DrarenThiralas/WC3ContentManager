@@ -3,6 +3,8 @@
 Backup/
 Temp/
 ContentPacks/
+Data/
+Work/
 config.ini
 
 # Byte-compiled / optimized / DLL files

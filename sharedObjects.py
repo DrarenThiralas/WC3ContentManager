@@ -29,7 +29,7 @@ class constants:
         return path
 
     def getBaseObjectData():
-        return objectData("Data\\BaseObjectData\\")
+        return objectData("Data\\BaseObjectData")
 
     objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
     triggerTypes = ['trigger', 'customscript', 'vars']
@@ -333,12 +333,15 @@ class objectData:
 
         config = [self.getConfig(dataType), newData.getConfig(dataType)]
 
-        for section in config[1].sections():
-            if not config[0].has_section(section):
-                config[0].add_section(section)
+        if config[0] == None:
+            config[0] = config[1]
+        else:
+            for section in config[1].sections():
+                if not config[0].has_section(section):
+                    config[0].add_section(section)
 
-            for option in config[1].options(section):
-                config[0].set(section, option, config[1][section][option])
+                for option in config[1].options(section):
+                    config[0].set(section, option, config[1][section][option])
 
         self.setConfig(dataType, config[0])
 
