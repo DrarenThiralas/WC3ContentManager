@@ -5,28 +5,17 @@ Created on Wed Apr 17 04:50:04 2024
 @author: maxer
 """
 
-import os, shutil, configparser
+import os
+from expandedConfig import expandedConfig
 from lmlParser import lmlParser, lmlLine, lmlEntry
 
 class constants:
 
-    def w3x2lni():
-        config = configparser.ConfigParser(interpolation=None)
+    def getGlobalOption(option):
+        config = expandedConfig()
         config.read("config.ini")
-        path = config["Settings"]["w3x2lni"]
-        return path
-
-    def mpqeditor():
-        config = configparser.ConfigParser(interpolation=None)
-        config.read("config.ini")
-        path = config["Settings"]["mpqedit"]
-        return path
-
-    def war3path():
-        config = configparser.ConfigParser(interpolation=None)
-        config.read("config.ini")
-        path = config["Settings"]["war3"]
-        return path
+        value = config["Settings"][option]
+        return value
 
     def getBaseObjectData():
         return objectData("Data\\BaseObjectData")
@@ -35,6 +24,7 @@ class constants:
     triggerTypes = ['trigger', 'customscript', 'vars']
     resourceTypes = ['resource']
     defaultTypes = objTypes + triggerTypes + resourceTypes
+
 
 def addIdentations(filePath):
     """
@@ -312,7 +302,7 @@ class objectData:
         sourceConfig = None
         if os.path.exists(sourcePath):
 
-            sourceConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+            sourceConfig = expandedConfig()
 
             try:
                 sourceConfig.read(sourcePath)
@@ -331,19 +321,8 @@ class objectData:
 
     def mergeDataType(self, newData, dataType):
 
-        config = [self.getConfig(dataType), newData.getConfig(dataType)]
-
-        if config[0] == None:
-            config[0] = config[1]
-        else:
-            for section in config[1].sections():
-                if not config[0].has_section(section):
-                    config[0].add_section(section)
-
-                for option in config[1].options(section):
-                    config[0].set(section, option, config[1][section][option])
-
-        self.setConfig(dataType, config[0])
+        config = self.getConfig(dataType).merge(newData.getConfig(dataType), isCopy = False)
+        self.setConfig(dataType, config)
 
     def mergeData(self, newData):
         for dataType in newData.getTypeList():

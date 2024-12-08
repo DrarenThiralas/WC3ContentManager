@@ -5,8 +5,17 @@ Created on Sat Dec  7 16:36:38 2024
 @author: Common
 """
 
-from sharedObjects import objectData
-import csv, configparser
+from expandedConfig import expandedConfig
+
+class slkConstants:
+
+    def fileNameToPath(filename):
+        return 'Data\\'+filename+'.slk'
+
+    metaDataFileNames = ['UnitMetaData', 'AbilityMetaData', 'MiscMetaData', 'UpgradeMetaData', 'UpgradeEffectMetaData']
+    unitSlks = ['UnitData', 'UnitBalance', 'UnitUI', 'UnitWeapons', 'UnitAbilities']
+    itemSlks = ['ItemData']
+    allSlks = unitSlks + itemSlks
 
 class slkReader:
 
@@ -41,32 +50,27 @@ class slkReader:
 
         return matrix
 
-    def toObjectData(self, path, dataType):
+    def toConfig(self, sectionColumn = 0):
 
-        objData = objectData(path)
-        objData.clear()
-
-        config = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+        config = expandedConfig()
 
         matrix = self.getMatrix()
-        print(matrix)
         columns = len(matrix[0])
         header = [entry[1:-1] for entry in matrix[0]]
         matrix = matrix[1:]
         for line in matrix:
+            sortedLine = [line[sectionColumn]]+line[:sectionColumn]+line[sectionColumn+1:]
             for i in range(columns):
                 if i == 0:
-                    config.add_section(line[i][1:-1])
+                    config.add_section(sortedLine[i][1:-1])
                 else:
-                    config.set(line[0][1:-1], header[i], line[i])
+                    if len(line)>i:
+                        value = sortedLine[i]
+                    else:
+                        value = ""
+                    config.set(sortedLine[0][1:-1], header[i], value)
 
-        objData.setConfig(dataType, config)
-
-
-
-
-
-
+        return config
 
 class slkLine:
 
@@ -99,7 +103,24 @@ class slkLine:
 
 
 
+def getSlkList(config):
+    slklist = [config[section]['slk'] for section in config.sections() if config.has_option(section, 'slk')]
+    return set(slklist)
 
-with open("UnitBalance.slk", newline='') as file:
-    reader = slkReader(file)
-    reader.toObjectData("Data\\BaseObjectDataTest", "unit")
+config = expandedConfig()
+
+for filename in slkConstants.metaDataFileNames:
+    filepath = slkConstants.fileNameToPath(filename)
+    with open(filepath, newline='') as file:
+        reader = slkReader(file)
+        #mtx = reader.getMatrix()
+        #sizes = [len(line) for line in mtx]
+        #print(sizes)
+        cfg = reader.toConfig()
+        config = config.merge(cfg, entryToAdd=('origin', filename))
+        #print(getSlkList(cfg))
+        file.close()
+
+with open("Data\\MetaData.ini", 'w') as configfile:
+    config.write(configfile)
+    configfile.close()

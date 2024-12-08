@@ -4,7 +4,8 @@ Created on Thu Apr 18 06:25:00 2024
 
 @author: maxer
 """
-import os, shutil, configparser
+import os, shutil
+from expandedConfig import expandedConfig
 from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel, QPushButton
 from PyQt6.QtCore import Qt
 from contentPack import contentPack
@@ -45,7 +46,7 @@ class mainWindowHelper:
 
         configPath = "config.ini"
         if os.path.exists(configPath):
-            config = configparser.ConfigParser(interpolation=None)
+            config = expandedConfig()
             config.read(configPath)
 
             if config.has_option("Settings", "w3x2lni"):
@@ -75,7 +76,7 @@ class mainWindowHelper:
             w3x2lniExists = False
             MPQEditorExists = False
 
-        newConfig = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+        newConfig = expandedConfig()
 
         if configExists:
             newConfig.read(configPath)

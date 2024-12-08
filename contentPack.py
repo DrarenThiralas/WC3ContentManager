@@ -5,14 +5,12 @@ Created on Sat Apr 13 03:34:10 2024
 @author: maxer
 """
 
-import subprocess, shutil, os
-
-from mapData import war3Map
+import os
 from sharedObjects import constants, contentContainer
 from contentPackParts import objectPack, triggerPack, resourcePack
 
 class contentPack:
-    
+
     def __init__(self, path):
         """
         Initializes a content pack object.
@@ -43,8 +41,8 @@ class contentPack:
         if os.path.exists(path+'\\imp.ini'):
             self.data.resourceData = resourcePack(path)
         else:
-            self.data.resourceData = None    
-            
+            self.data.resourceData = None
+
     def getObjConfDict(self):
         """
         Returns the pack's object data as a dictionary.
@@ -61,7 +59,7 @@ class contentPack:
             if os.path.exists(self.path+"\\"+Type+".ini"):
                 confDict[Type]=self.data.objData.getConfig(Type)
         return confDict
-        
+
     def apply(self, w3map, dataTypes=constants.defaultTypes):
         """
         Applies the specified data types from
@@ -81,15 +79,14 @@ class contentPack:
             The map that the pack was applied to.
 
         """
-        
+
         objectTypesArg = [Type for Type in dataTypes if Type in constants.objTypes]
         triggerTypesArg = [Type for Type in dataTypes if Type in constants.triggerTypes]
-            
+
         self.data.objData.apply(w3map, objectTypesArg)
         if self.data.triggerData != None:
             self.data.triggerData.apply(w3map, triggerTypesArg)
         if self.data.resourceData != None:
             self.data.resourceData.apply(w3map)
-            
+
         return w3map
-        

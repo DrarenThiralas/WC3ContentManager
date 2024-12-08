@@ -14,9 +14,13 @@ class objectEditor:
     def __init__(self):
         self.helper = objectEditorHelper(self)
         self.objectData = None
+        self.columns = ["ID", "Name", "Category", "Type", "Value"]
         self.initSpace()
         self.initWidget()
         self.initEditLine()
+
+    def getColumn(self, name):
+        return self.columns.index(name)
 
     def setObjectData(self, objectData):
         self.objectData = objectData
@@ -30,8 +34,8 @@ class objectEditor:
     def initWidget(self):
         self.widget = QTreeWidget(parent=self.space)
         self.widget.setGeometry(20, 20, 1100-80-40, 780-120-40-80)
-        self.widget.setColumnCount(3)
-        self.widget.setHeaderLabels(["ID", "Name", "Value"])
+        self.widget.setColumnCount(len(self.columns))
+        self.widget.setHeaderLabels(self.columns)
         self.widget.itemSelectionChanged.connect(self.helper.startEdit)
 
     def initEditLine(self):

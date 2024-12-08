@@ -6,8 +6,8 @@ Created on Sat Dec  7 15:39:13 2024
 """
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout
-import configparser
-from sharedObjects import constants, objectData
+from expandedConfig import expandedConfig
+from sharedObjects import constants, objectData, addIdentations
 
 class objectEditorHelper:
 
@@ -15,10 +15,12 @@ class objectEditorHelper:
         self.editor = editor
         self.workData = objectData("Work\\ObjectEditor")
         self.clearObjectData()
+        self.metaconf = expandedConfig()
+        self.strconf = expandedConfig()
 
     def clearObjectData(self):
         self.workData.clear()
-        self.workData.mergeData(constants.getBaseObjectData())
+        #self.workData.mergeData(constants.getBaseObjectData())
 
     def addObjectData(self, objData):
         self.workData.mergeData(objData)
@@ -27,26 +29,103 @@ class objectEditorHelper:
         self.clearObjectData()
         self.addObjectData(objData)
 
+    def applyStringLocal(self, name):
+        ans = ''
+        for option in self.strconf.options('WorldEditStrings'):
+            if option.lower() == name.lower():
+                ans = self.strconf['WorldEditStrings'][option]
+        return ans
+
+    def setMetaData(self, path):
+        try:
+            self.metaconf.read(path)
+        except:
+            addIdentations(path)
+            self.metaconf.read(path)
+
+    def setStringData(self, path):
+        try:
+            self.strconf.read(path)
+        except:
+            addIdentations(path)
+            self.strconf.read(path)
+
+    def applyMetaData(self, field):
+        metadata = self.getMetaData(field)
+        if metadata != None:
+            name = metadata['displayname'][1:-1]
+            if name[:8] == "WESTRING":
+                name = self.applyStringLocal(name)
+            fieldType = metadata['type'][1:-1]
+            category = metadata['category'][1:-1]
+            field.setText(self.editor.getColumn('Name'), name)
+            field.setText(self.editor.getColumn('Type'), fieldType)
+            field.setText(self.editor.getColumn('Category'), category)
+
+    def getMetaData(self, field):
+
+        f = None
+
+        name = field.text(self.editor.getColumn('ID'))
+        fieldObject = field.parent()
+        fieldObjectType = fieldObject.parent()
+        fieldObjectTypeName = fieldObjectType.text(self.editor.getColumn('ID'))
+
+        if fieldObjectTypeName == 'item':
+            #print('getting data for item: '+name)
+            f = lambda section: (int(section['useitem'])==1) and section['origin']=='UnitMetaData'
+        elif fieldObjectTypeName == 'unit':
+            f = lambda section: ((int(section['useunit'])==1)
+                                 or (int(section['usehero'])==1)
+                                 or (int(section['usebuilding'])==1)) and section['origin']=='UnitMetaData'
+        elif fieldObjectTypeName == 'misc':
+            f = lambda section: section['section'][1:-1] == 'Misc' and section['origin']=='MiscMetaData'
+        elif fieldObjectTypeName == 'ability':
+            f = lambda section: section['origin']=='AbilityMetaData'
+        elif fieldObjectTypeName == 'upgrade':
+            f = lambda section: section['origin']=='UpgradeMetaData' or section['origin']=='UpgradeEffectMetaData'
+
+        return self.findMetaData(name, f)
+
+
+    def findMetaData(self, name, validator):
+        #print('running find metadata for '+name)
+        ans = None
+        for section in self.metaconf.sections():
+            #print('section '+section)
+            fieldName = self.metaconf[section]['field'][1:-1]
+            #print('getting data for '+fieldName+', section '+section)
+            if fieldName.lower() == name.lower() and validator != None and validator(self.metaconf[section]):
+                ans = self.metaconf[section]
+        return ans
+
+
     def populateObjects(self):
         self.editor.widget.clear()
+
+        path = "Data\\MetaData.ini"
+        self.setMetaData(path)
+        self.setStringData("Data\\WorldEditStrings.txt")
+
         objItems = [QTreeWidgetItem(self.editor.widget) for objType in constants.objTypes]
         for i in range(len(objItems)):
             objItem = objItems[i]
             objType = constants.objTypes[i]
-            objItem.setText(0, objType)
+            objItem.setText(self.editor.getColumn('ID'), objType)
             config = self.workData.getConfig(objType)
             if not config == None:
                 objectIDs = config.sections()
                 objectNames = [config[obj]["Name"] if config.has_option(obj, "Name") else "" for obj in objectIDs]
                 objects = [QTreeWidgetItem(objItem) for obj in objectIDs]
                 for j in range(len(objects)):
-                    objects[j].setText(0, objectIDs[j])
-                    objects[j].setText(1, objectNames[j])
+                    objects[j].setText(self.editor.getColumn('ID'), objectIDs[j])
+                    objects[j].setText(self.editor.getColumn('Name'), objectNames[j])
                     objectFields = config.options(objectIDs[j])
                     fields = [QTreeWidgetItem(objects[j]) for obj in objectFields]
                     for k in range(len(objectFields)):
-                        fields[k].setText(0, objectFields[k])
-                        fields[k].setText(2, config[objectIDs[j]][objectFields[k]])
+                        fields[k].setText(self.editor.getColumn('ID'), objectFields[k])
+                        fields[k].setText(self.editor.getColumn('Value'), config[objectIDs[j]][objectFields[k]])
+                        self.applyMetaData(fields[k])
 
     def confirmEdit(self):
         selection = self.editor.widget.selectedItems()
@@ -55,7 +134,7 @@ class objectEditorHelper:
             line.setText("")
         else:
             value = line.text()
-            selection[0].setText(2, value)
+            selection[0].setText(self.editor.getColumn('Value'), value)
 
     def startEdit(self):
         selection = self.editor.widget.selectedItems()
@@ -63,22 +142,22 @@ class objectEditorHelper:
         if len(selection) != 1:
             line.setText("")
         else:
-            line.setText(selection[0].text(2))
+            line.setText(selection[0].text(self.editor.getColumn('Value')))
 
     def applyEdits(self):
         widget = self.editor.widget
         topLevelItems = [widget.topLevelItem(i) for i in range(widget.topLevelItemCount()) if widget.topLevelItem(i).childCount()>0]
         for dataType in topLevelItems:
-            config = configparser.ConfigParser(comment_prefixes=('--'), strict=False, interpolation=None)
+            config = expandedConfig()
             objects = [dataType.child(i) for i in range(dataType.childCount())]
             for obj in objects:
                 fields = [obj.child(i) for i in range(obj.childCount())]
                 for field in fields:
-                    section = obj.text(0)
-                    option = field.text(0)
+                    section = obj.text(self.editor.getColumn('ID'))
+                    option = field.text(self.editor.getColumn('ID'))
                     if not config.has_section(section):
                         config.add_section(section)
-                    config[section][option] = field.text(2)
-            self.workData.setConfig(dataType.text(0), config)
-        self.workData.subtractData(constants.getBaseObjectData())
+                    config[section][option] = field.text(self.editor.getColumn('Value'))
+            self.workData.setConfig(dataType.text(self.editor.getColumn('ID')), config)
+        #self.workData.subtractData(constants.getBaseObjectData())
         self.editor.objectData.setData(self.workData)
