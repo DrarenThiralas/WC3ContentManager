@@ -14,7 +14,7 @@ class objectEditor:
     def __init__(self):
         self.helper = objectEditorHelper(self)
         self.objectData = None
-        self.columns = ["ID", "Name", "Category", "Type", "Value"]
+        self.columns = ["ID", "Name", "Value", "Type", "Category"]
         self.initSpace()
         self.initWidget()
         self.initEditLine()

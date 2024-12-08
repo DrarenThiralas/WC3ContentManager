@@ -25,12 +25,12 @@ class expandedConfig(configparser.ConfigParser):
     def merge(self, cfg, overrideSections = False, entryToAdd = None, isCopy = True):
 
         cfgNew = self.copy() if isCopy else self
-        for section in cfg.sections():
-            if not cfgNew.has_section(section):
-                cfgNew.add_section(section)
-            if entryToAdd != None:
-                cfgNew.set(section, *entryToAdd)
-            for option in cfg.options(section):
-                cfgNew.set(section, option, cfg[section][option])
-
+        if not cfg == None:
+            for section in cfg.sections():
+                if not cfgNew.has_section(section):
+                    cfgNew.add_section(section)
+                if entryToAdd != None:
+                    cfgNew.set(section, *entryToAdd)
+                for option in cfg.options(section):
+                    cfgNew.set(section, option, cfg[section][option])
         return cfgNew

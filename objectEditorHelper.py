@@ -9,14 +9,97 @@ from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLine
 from expandedConfig import expandedConfig
 from sharedObjects import constants, objectData, addIdentations
 
+
+class metaData:
+
+    def __init__(self):
+
+        self.config = expandedConfig()
+        self.strconf = expandedConfig()
+        self.cache = {}
+        self.strcache = {}
+
+    def setMetaData(self, path):
+        try:
+            self.config.read(path)
+        except:
+            addIdentations(path)
+            self.config.read(path)
+
+    def setStringData(self, path):
+        try:
+            self.strconf.read(path)
+        except:
+            addIdentations(path)
+            self.strconf.read(path)
+
+    def get(self, field):
+
+        f = None
+
+        name = field.text(0)
+        fieldObject = field.parent()
+        fieldObjectType = fieldObject.parent()
+        fieldObjectTypeName = fieldObjectType.text(0)
+
+        if fieldObjectTypeName == 'item':
+            f = lambda section: ((section['origin']=='UnitMetaData')
+                                 and 'useitem' in section
+                                 and (int(section['useitem'])==1))
+        elif fieldObjectTypeName == 'unit':
+            f = lambda section: (section['origin']=='UnitMetaData'
+                                 and ((int(section['useunit'])==1)
+                                 or (int(section['usehero'])==1)
+                                 or (int(section['usebuilding'])==1)))
+        elif fieldObjectTypeName == 'misc':
+            f = lambda section: (section['origin']=='MiscMetaData'
+                                 and section['section'][1:-1] == 'Misc')
+        elif fieldObjectTypeName == 'ability':
+            f = lambda section: section['origin']=='AbilityMetaData'
+        elif fieldObjectTypeName == 'upgrade':
+            f = lambda section: (section['origin']=='UpgradeMetaData'
+                                 or section['origin']=='UpgradeEffectMetaData')
+
+
+        ans = self.cache[name] if f != None and name in self.cache else self.find(name, f)
+        self.cache.update([[name, ans]])
+        return ans
+
+    def applyStringLocal(self, name):
+        if name in self.strcache:
+            return self.strcache[name]
+        else:
+            for option in self.strconf.options('WorldEditStrings'):
+                if option.lower() == name.lower():
+                    ans = self.strconf['WorldEditStrings'][option]
+                    self.strcache.update([[name, ans]])
+                    return ans
+        return ''
+
+
+    def find(self, name, validator = None):
+        #print('running find metadata for '+name)
+        for section in self.config.sections():
+            #print('section '+section)
+            fieldName = self.config[section]['field'][1:-1]
+            #print('getting data for '+fieldName+', section '+section)
+            if fieldName.lower() == name.lower() and validator != None and validator(self.config[section]):
+                return self.config[section]
+        return None
+
 class objectEditorHelper:
 
     def __init__(self, editor):
         self.editor = editor
         self.workData = objectData("Work\\ObjectEditor")
         self.clearObjectData()
-        self.metaconf = expandedConfig()
-        self.strconf = expandedConfig()
+        self.metadata = metaData()
+
+    def setMetaData(self, path):
+        self.metadata.setMetaData(path)
+
+    def setStringData(self, path):
+        self.metadata.setStringData(path)
 
     def clearObjectData(self):
         self.workData.clear()
@@ -29,75 +112,17 @@ class objectEditorHelper:
         self.clearObjectData()
         self.addObjectData(objData)
 
-    def applyStringLocal(self, name):
-        ans = ''
-        for option in self.strconf.options('WorldEditStrings'):
-            if option.lower() == name.lower():
-                ans = self.strconf['WorldEditStrings'][option]
-        return ans
-
-    def setMetaData(self, path):
-        try:
-            self.metaconf.read(path)
-        except:
-            addIdentations(path)
-            self.metaconf.read(path)
-
-    def setStringData(self, path):
-        try:
-            self.strconf.read(path)
-        except:
-            addIdentations(path)
-            self.strconf.read(path)
-
     def applyMetaData(self, field):
-        metadata = self.getMetaData(field)
+        metadata = self.metadata.get(field)
         if metadata != None:
             name = metadata['displayname'][1:-1]
             if name[:8] == "WESTRING":
-                name = self.applyStringLocal(name)
+                name = self.metadata.applyStringLocal(name)
             fieldType = metadata['type'][1:-1]
             category = metadata['category'][1:-1]
             field.setText(self.editor.getColumn('Name'), name)
             field.setText(self.editor.getColumn('Type'), fieldType)
             field.setText(self.editor.getColumn('Category'), category)
-
-    def getMetaData(self, field):
-
-        f = None
-
-        name = field.text(self.editor.getColumn('ID'))
-        fieldObject = field.parent()
-        fieldObjectType = fieldObject.parent()
-        fieldObjectTypeName = fieldObjectType.text(self.editor.getColumn('ID'))
-
-        if fieldObjectTypeName == 'item':
-            #print('getting data for item: '+name)
-            f = lambda section: (int(section['useitem'])==1) and section['origin']=='UnitMetaData'
-        elif fieldObjectTypeName == 'unit':
-            f = lambda section: ((int(section['useunit'])==1)
-                                 or (int(section['usehero'])==1)
-                                 or (int(section['usebuilding'])==1)) and section['origin']=='UnitMetaData'
-        elif fieldObjectTypeName == 'misc':
-            f = lambda section: section['section'][1:-1] == 'Misc' and section['origin']=='MiscMetaData'
-        elif fieldObjectTypeName == 'ability':
-            f = lambda section: section['origin']=='AbilityMetaData'
-        elif fieldObjectTypeName == 'upgrade':
-            f = lambda section: section['origin']=='UpgradeMetaData' or section['origin']=='UpgradeEffectMetaData'
-
-        return self.findMetaData(name, f)
-
-
-    def findMetaData(self, name, validator):
-        #print('running find metadata for '+name)
-        ans = None
-        for section in self.metaconf.sections():
-            #print('section '+section)
-            fieldName = self.metaconf[section]['field'][1:-1]
-            #print('getting data for '+fieldName+', section '+section)
-            if fieldName.lower() == name.lower() and validator != None and validator(self.metaconf[section]):
-                ans = self.metaconf[section]
-        return ans
 
 
     def populateObjects(self):

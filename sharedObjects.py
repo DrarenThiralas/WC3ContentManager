@@ -321,7 +321,7 @@ class objectData:
 
     def mergeDataType(self, newData, dataType):
 
-        config = self.getConfig(dataType).merge(newData.getConfig(dataType), isCopy = False)
+        config = newData.getConfig(dataType).merge(self.getConfig(dataType), isCopy = False)
         self.setConfig(dataType, config)
 
     def mergeData(self, newData):

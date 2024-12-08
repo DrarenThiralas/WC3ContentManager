@@ -234,8 +234,9 @@ class mainWindowHelper:
 
     def openContentEditor(self, content):
 
-        self.window.contentEditor.setContent(content)
         self.window.contentEditor.window.open()
+        self.window.contentEditor.setContent(content)
+
 
     def selectMapFunction(self):
 
