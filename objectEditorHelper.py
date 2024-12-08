@@ -9,33 +9,45 @@ from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLine
 from expandedConfig import expandedConfig
 from sharedObjects import constants, objectData, addIdentations
 
+metaDataFiles = ['UnitMetaData.ini',
+                 'MiscMetaData.ini',
+                 'AbilityMetaData.ini',
+                 'UpgradeMetaData.ini',
+                 'DestructableMetaData.ini',
+                 'DoodadMetaData.ini']
+stringDataFiles = ['UI\\WorldEditStrings.txt']
 
 class metaData:
 
     def __init__(self):
 
-        self.config = expandedConfig()
-        self.strconf = expandedConfig()
+        self.configs = {}
+        self.strconfs = {}
         self.cache = {}
         self.strcache = {}
 
-    def setMetaData(self, path):
-        try:
-            self.config.read(path)
-        except:
-            addIdentations(path)
-            self.config.read(path)
+    def loadMetaData(self):
+        for file in metaDataFiles:
+            self.configs[file] = expandedConfig()
+            try:
+                self.configs[file].read('Data\\'+file)
+            except:
+                addIdentations('Data\\'+file)
+                self.configs[file].read('Data\\'+file)
 
-    def setStringData(self, path):
-        try:
-            self.strconf.read(path)
-        except:
-            addIdentations(path)
-            self.strconf.read(path)
+    def loadStringData(self):
+        for file in stringDataFiles:
+            self.strconfs[file] = expandedConfig()
+            try:
+                self.strconfs[file].read('Data\\'+file)
+            except:
+                addIdentations('Data\\'+file)
+                self.strconfs[file].read('Data\\'+file)
 
     def get(self, field):
 
         f = None
+        file = None
 
         name = field.text(0)
         fieldObject = field.parent()
@@ -43,25 +55,32 @@ class metaData:
         fieldObjectTypeName = fieldObjectType.text(0)
 
         if fieldObjectTypeName == 'item':
-            f = lambda section: ((section['origin']=='UnitMetaData')
-                                 and 'useitem' in section
+            file = 'UnitMetaData.ini'
+            f = lambda section: (('useitem' in section)
                                  and (int(section['useitem'])==1))
         elif fieldObjectTypeName == 'unit':
-            f = lambda section: (section['origin']=='UnitMetaData'
-                                 and ((int(section['useunit'])==1)
+            file = 'UnitMetaData.ini'
+            f = lambda section: ((int(section['useunit'])==1)
                                  or (int(section['usehero'])==1)
-                                 or (int(section['usebuilding'])==1)))
+                                 or (int(section['usebuilding'])==1))
         elif fieldObjectTypeName == 'misc':
-            f = lambda section: (section['origin']=='MiscMetaData'
-                                 and section['section'][1:-1] == 'Misc')
+            file = 'MiscMetaData.ini'
+            f = lambda section: (section['section'][1:-1] == 'Misc')
         elif fieldObjectTypeName == 'ability':
-            f = lambda section: section['origin']=='AbilityMetaData'
+            file = 'AbilityMetaData.ini'
+            f = lambda section: True
         elif fieldObjectTypeName == 'upgrade':
-            f = lambda section: (section['origin']=='UpgradeMetaData'
-                                 or section['origin']=='UpgradeEffectMetaData')
+            file = 'UpgradeMetaData.ini'
+            f = lambda section: True
+        elif fieldObjectTypeName == 'destructable':
+            file = 'DestructableMetaData.ini'
+            f = lambda section: True
+        elif fieldObjectTypeName == 'doodad':
+            file = 'DoodadMetaData.ini'
+            f = lambda section: True
 
 
-        ans = self.cache[name] if f != None and name in self.cache else self.find(name, f)
+        ans = self.cache[name] if f != None and name in self.cache else self.find(file, name, f)
         self.cache.update([[name, ans]])
         return ans
 
@@ -69,22 +88,26 @@ class metaData:
         if name in self.strcache:
             return self.strcache[name]
         else:
-            for option in self.strconf.options('WorldEditStrings'):
-                if option.lower() == name.lower():
-                    ans = self.strconf['WorldEditStrings'][option]
-                    self.strcache.update([[name, ans]])
-                    return ans
+            for key in self.strconfs:
+                strconf = self.strconfs[key]
+                if strconf.has_section('WorldEditStrings'):
+                    for option in strconf.options('WorldEditStrings'):
+                        if option.lower() == name.lower():
+                            ans = strconf['WorldEditStrings'][option]
+                            self.strcache.update([[name, ans]])
+                            return ans
         return ''
 
 
-    def find(self, name, validator = None):
-        #print('running find metadata for '+name)
-        for section in self.config.sections():
-            #print('section '+section)
-            fieldName = self.config[section]['field'][1:-1]
-            #print('getting data for '+fieldName+', section '+section)
-            if fieldName.lower() == name.lower() and validator != None and validator(self.config[section]):
-                return self.config[section]
+    def find(self, file, name, validator = None):
+        if file != None:
+            #print('running find metadata for '+name)
+            for section in self.configs[file].sections():
+                #print('section '+section)
+                fieldName = self.configs[file][section]['field'][1:-1]
+                #print('getting data for '+fieldName+', section '+section)
+                if fieldName.lower() == name.lower() and validator != None and validator(self.configs[file][section]):
+                    return self.configs[file][section]
         return None
 
 class objectEditorHelper:
@@ -95,11 +118,11 @@ class objectEditorHelper:
         self.clearObjectData()
         self.metadata = metaData()
 
-    def setMetaData(self, path):
-        self.metadata.setMetaData(path)
+    def loadMetaData(self):
+        self.metadata.loadMetaData()
 
-    def setStringData(self, path):
-        self.metadata.setStringData(path)
+    def loadStringData(self):
+        self.metadata.loadStringData()
 
     def clearObjectData(self):
         self.workData.clear()
@@ -128,9 +151,8 @@ class objectEditorHelper:
     def populateObjects(self):
         self.editor.widget.clear()
 
-        path = "Data\\MetaData.ini"
-        self.setMetaData(path)
-        self.setStringData("Data\\WorldEditStrings.txt")
+        self.loadMetaData()
+        self.loadStringData()
 
         objItems = [QTreeWidgetItem(self.editor.widget) for objType in constants.objTypes]
         for i in range(len(objItems)):

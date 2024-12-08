@@ -9,10 +9,6 @@ from expandedConfig import expandedConfig
 
 class slkConstants:
 
-    def fileNameToPath(filename):
-        return 'Data\\'+filename+'.slk'
-
-    metaDataFileNames = ['UnitMetaData', 'AbilityMetaData', 'MiscMetaData', 'UpgradeMetaData', 'UpgradeEffectMetaData']
     unitSlks = ['UnitData', 'UnitBalance', 'UnitUI', 'UnitWeapons', 'UnitAbilities']
     itemSlks = ['ItemData']
     allSlks = unitSlks + itemSlks
@@ -23,7 +19,7 @@ class slkReader:
         self.file = file
 
     def lines(self):
-        return [slkLine(line) for line in file.readlines()]
+        return [slkLine(line) for line in self.file.readlines()]
 
     def getMatrix(self):
         matrix = []
@@ -106,21 +102,3 @@ class slkLine:
 def getSlkList(config):
     slklist = [config[section]['slk'] for section in config.sections() if config.has_option(section, 'slk')]
     return set(slklist)
-
-config = expandedConfig()
-
-for filename in slkConstants.metaDataFileNames:
-    filepath = slkConstants.fileNameToPath(filename)
-    with open(filepath, newline='') as file:
-        reader = slkReader(file)
-        #mtx = reader.getMatrix()
-        #sizes = [len(line) for line in mtx]
-        #print(sizes)
-        cfg = reader.toConfig()
-        config = config.merge(cfg, entryToAdd=('origin', filename))
-        #print(getSlkList(cfg))
-        file.close()
-
-with open("Data\\MetaData.ini", 'w') as configfile:
-    config.write(configfile)
-    configfile.close()

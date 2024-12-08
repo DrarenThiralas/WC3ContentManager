@@ -11,6 +11,7 @@ from PyQt6.QtCore import Qt
 from contentPack import contentPack
 from mapData import war3Map
 from sharedObjects import constants
+from mpqExtractor import dataConstants, dataMaker
 
 class mainWindowHelper:
 
@@ -108,7 +109,25 @@ class mainWindowHelper:
 
     def prepareData(self):
 
+        os.makedirs('Data')
+        self.prepareObjectMetaData()
+        self.prepareObjectStringData()
         self.prepareBaseObjectData()
+
+
+    def prepareObjectMetaData(self):
+
+        extractor = dataMaker('War3x.mpq')
+        for entry in dataConstants.metaDataFiles:
+            targetName = entry.split('\\')[1][:-4]
+            targetPath = 'Data\\'+targetName+'.ini'
+            extractor.process(entry, targetPath)
+
+    def prepareObjectStringData(self):
+
+        extractor = dataMaker('War3xlocal.mpq')
+        for entry in dataConstants().stringDataFiles:
+            extractor.extract(entry, "Data")
 
     def prepareBaseObjectData(self):
 

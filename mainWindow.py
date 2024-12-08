@@ -26,6 +26,7 @@ class mainWindow:
         self.helper = mainWindowHelper(self)
         self.initWindow()
         self.helper.checkConfig()
+        self.helper.checkData()
         self.initMapSelector()
         self.initPackSelector()
         self.initResMsg()
