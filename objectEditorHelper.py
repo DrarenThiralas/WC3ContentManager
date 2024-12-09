@@ -8,109 +8,9 @@ Created on Sat Dec  7 15:39:13 2024
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout, QInputDialog
 from expandedConfig import expandedConfig
 from sharedObjects import constants, objectData, addIdentations
-
-class objectEditorConstants:
-    metaDataFiles = ['UnitMetaData.ini',
-                     'MiscMetaData.ini',
-                     'AbilityMetaData.ini',
-                     'UpgradeMetaData.ini',
-                     'DestructableMetaData.ini',
-                     'DoodadMetaData.ini']
-    stringDataFiles = ['UI\\WorldEditStrings.txt']
-    selectionTypes = ['category', 'object', 'field']
-
-class metaData:
-
-    def __init__(self):
-
-        self.configs = {}
-        self.strconfs = {}
-        self.cache = {}
-        self.strcache = {}
-
-    def loadMetaData(self):
-        for file in objectEditorConstants.metaDataFiles:
-            self.configs[file] = expandedConfig()
-            try:
-                self.configs[file].read('Data\\'+file)
-            except:
-                addIdentations('Data\\'+file)
-                self.configs[file].read('Data\\'+file)
-
-    def loadStringData(self):
-        for file in objectEditorConstants.stringDataFiles:
-            self.strconfs[file] = expandedConfig()
-            try:
-                self.strconfs[file].read('Data\\'+file)
-            except:
-                addIdentations('Data\\'+file)
-                self.strconfs[file].read('Data\\'+file)
-
-    def get(self, field):
-
-        f = None
-        file = None
-
-        name = field.text(0)
-        fieldObject = field.parent()
-        fieldObjectType = fieldObject.parent()
-        fieldObjectTypeName = fieldObjectType.text(0)
-
-        if fieldObjectTypeName == 'item':
-            file = 'UnitMetaData.ini'
-            f = lambda section: (('useitem' in section)
-                                 and (int(section['useitem'])==1))
-        elif fieldObjectTypeName == 'unit':
-            file = 'UnitMetaData.ini'
-            f = lambda section: ((int(section['useunit'])==1)
-                                 or (int(section['usehero'])==1)
-                                 or (int(section['usebuilding'])==1))
-        elif fieldObjectTypeName == 'misc':
-            file = 'MiscMetaData.ini'
-            f = lambda section: (section['section'][1:-1] == 'Misc')
-        elif fieldObjectTypeName == 'ability':
-            file = 'AbilityMetaData.ini'
-            f = lambda section: True
-        elif fieldObjectTypeName == 'upgrade':
-            file = 'UpgradeMetaData.ini'
-            f = lambda section: True
-        elif fieldObjectTypeName == 'destructable':
-            file = 'DestructableMetaData.ini'
-            f = lambda section: True
-        elif fieldObjectTypeName == 'doodad':
-            file = 'DoodadMetaData.ini'
-            f = lambda section: True
+from contentEditorShared import objectConstants, metaData
 
 
-        ans = self.cache[name] if f != None and name in self.cache else self.find(file, name, f)
-        self.cache.update([[name, ans]])
-        return ans
-
-    def applyStringLocal(self, name):
-        if name in self.strcache:
-            return self.strcache[name]
-        else:
-            for key in self.strconfs:
-                strconf = self.strconfs[key]
-                if strconf.has_section('WorldEditStrings'):
-                    for option in strconf.options('WorldEditStrings'):
-                        if option.lower() == name.lower():
-                            ans = strconf['WorldEditStrings'][option]
-                            self.strcache.update([[name, ans]])
-                            return ans
-        return ''
-
-
-    def find(self, file, name, validator = None):
-        if file != None:
-            #print('running find metadata for '+name)
-            for section in self.configs[file].sections():
-                #print('section '+section)
-                fieldName = self.configs[file][section]['field'][1:-1]
-                #print('getting data for '+fieldName+', section '+section)
-                if fieldName.lower() == name.lower() and validator != None and validator(self.configs[file][section]):
-                    return self.configs[file][section]
-        return None
 
 class objectEditorHelper:
 
@@ -193,7 +93,7 @@ class objectEditorHelper:
                 entry = entry.parent()
                 #print('parent is '+str(entry))
                 i+=1
-            return objectEditorConstants.selectionTypes[i]
+            return objectConstants.selectionTypes[i]
 
     def getSelectedOfType(self, Type):
         selection = self.getSelection()
