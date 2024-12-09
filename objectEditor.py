@@ -40,9 +40,22 @@ class objectEditor:
 
     def initEditLine(self):
         self.editLine = QLineEdit(parent = self.space)
-        self.editLine.setGeometry(20, 780-120-40-40, 1100-120-200, 20)
+        self.editLine.setGeometry(20, 780-120-40-20-24, 1100-120-200, 24)
+
         self.editButton = QPushButton(parent = self.space)
-        self.editButton.setGeometry(1100-120-120, 780-120-40-40, 60, 20)
+        self.editButton.setGeometry(1100-120-200-40, 780-120-40-20+5, 60, 24)
         self.editButton.setText("Apply")
         self.editButton.clicked.connect(self.helper.confirmEdit)
         self.editButton.setShortcut(Qt.Key.Key_Enter)
+
+        self.newButton = QPushButton(parent = self.space)
+        self.newButton.setGeometry(20, 780-120-40-20+5, 60, 24)
+        self.newButton.setText("New")
+        self.newButton.clicked.connect(self.helper.createNew)
+        self.newButton.setShortcut(Qt.Key.Key_N)
+
+        self.deleteButton = QPushButton(parent = self.space)
+        self.deleteButton.setGeometry(100, 780-120-40-20+5, 60, 24)
+        self.deleteButton.setText("Delete")
+        self.deleteButton.clicked.connect(self.helper.deleteField)
+        self.deleteButton.setShortcut(Qt.Key.Key_Delete)
