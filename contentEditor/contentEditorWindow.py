@@ -6,7 +6,7 @@ Created on Fri Dec  6 14:30:16 2024
 """
 
 from PyQt6.QtWidgets import QPushButton, QDialog, QTabWidget
-from objectEditor import objectEditor
+from contentEditor.objectEditor.objectEditorMain import objectEditor
 
 class contentEditorHelper:
 

@@ -6,9 +6,9 @@ Created on Sat Dec  7 15:39:13 2024
 """
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout, QInputDialog
-from expandedConfig import expandedConfig
+from extra.expandedConfig import expandedConfig
 from sharedObjects import constants, objectData, addIdentations
-from contentEditorShared import objectConstants, metaData
+from contentEditor.contentEditorShared import objectConstants, metaData
 
 
 

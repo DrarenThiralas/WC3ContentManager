@@ -5,7 +5,7 @@ Created on Sat Dec  7 16:36:38 2024
 @author: Common
 """
 
-from expandedConfig import expandedConfig
+from extra.expandedConfig import expandedConfig
 
 class slkConstants:
 

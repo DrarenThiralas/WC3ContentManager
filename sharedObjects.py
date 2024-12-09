@@ -6,8 +6,8 @@ Created on Wed Apr 17 04:50:04 2024
 """
 
 import os
-from expandedConfig import expandedConfig
-from lmlParser import lmlParser, lmlLine, lmlEntry
+from extra.expandedConfig import expandedConfig
+from extra.lmlParser import lmlParser, lmlLine, lmlEntry
 
 class constants:
 

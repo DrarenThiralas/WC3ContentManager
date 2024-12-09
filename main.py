@@ -7,7 +7,7 @@ Created on Fri Apr 12 18:12:14 2024
 
 import sys
 from PyQt6.QtWidgets import QApplication
-from mainWindow import mainWindow  
+from mainWindow.mainWindowMain import mainWindow
 
 app = QApplication([])
 

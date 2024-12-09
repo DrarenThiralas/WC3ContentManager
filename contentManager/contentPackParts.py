@@ -6,8 +6,8 @@ Created on Thu Apr 18 06:19:35 2024
 """
 
 import os, shutil
-from expandedConfig import expandedConfig
-from lmlParser import lmlParser
+from extra.expandedConfig import expandedConfig
+from extra.lmlParser import lmlParser
 from sharedObjects import addIdentations
 from sharedObjects import resourceData, triggerCategory, triggerData, objectData
 

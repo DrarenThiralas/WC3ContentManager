@@ -5,13 +5,13 @@ Created on Thu Apr 18 06:25:00 2024
 @author: maxer
 """
 import os, shutil
-from expandedConfig import expandedConfig
+from extra.expandedConfig import expandedConfig
 from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel, QPushButton
 from PyQt6.QtCore import Qt
-from contentPack import contentPack
-from mapData import war3Map
+from contentManager.contentPack import contentPack
+from contentManager.mapData import war3Map
 from sharedObjects import constants
-from mpqExtractor import dataConstants, dataMaker
+from extra.mpqExtractor import dataConstants, dataMaker
 
 class mainWindowHelper:
 
@@ -177,7 +177,7 @@ class mainWindowHelper:
                 layout.addWidget(editButton, i, 1)
                 i+=1
 
-        geometry = (40, 140, 820, 40*i)
+        geometry = (40, 40, 320, 40*i)
 
         return geometry, layout
 

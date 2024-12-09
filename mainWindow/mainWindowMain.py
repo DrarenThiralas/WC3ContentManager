@@ -8,9 +8,9 @@ Created on Thu Apr 18 06:24:31 2024
 from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout, QProgressDialog
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
-from mainWindowHelper import mainWindowHelper
+from mainWindow.mainWindowHelper import mainWindowHelper
 
-from contentEditorWindow import contentEditorWindow
+from contentEditor.contentEditorWindow import contentEditorWindow
 
 class mainWindow:
 
@@ -57,10 +57,11 @@ class mainWindow:
 
     def initPackSelector(self):
 
-        self.packSelectorHeader = QLabel(parent=self.window)
-        self.packSelectorHeader.setGeometry(40, 120, 820, 40)
-
         self.packSelectorSpace = QWidget(parent=self.window)
+        self.packSelectorSpace.setGeometry(480, 120, 400, 500)
+        self.packSelectorHeader = QLabel(parent=self.packSelectorSpace)
+        self.packSelectorHeader.setGeometry(40, 10, 240, 40)
+        self.packSelector = QWidget(parent=self.packSelectorSpace)
         geometry, layout = self.helper.importContentPacks()
 
         if geometry[3] > 0:
@@ -68,8 +69,8 @@ class mainWindow:
         else:
             self.packSelectorHeader.setText("No Content Packs Found!")
 
-        self.packSelectorSpace.setGeometry(*geometry)
-        self.packSelectorSpace.setLayout(layout)
+        self.packSelector.setGeometry(*geometry)
+        self.packSelector.setLayout(layout)
 
     def initResMsg(self):
 

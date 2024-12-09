@@ -7,7 +7,7 @@ Created on Fri Dec  6 15:19:20 2024
 
 from PyQt6.QtWidgets import QWidget, QTreeWidget, QLineEdit, QPushButton
 from PyQt6.QtCore import Qt
-from objectEditorHelper import objectEditorHelper
+from contentEditor.objectEditor.objectEditorHelper import objectEditorHelper
 
 class objectEditor:
 

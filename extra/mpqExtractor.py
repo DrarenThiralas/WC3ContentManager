@@ -6,8 +6,7 @@ Created on Sun Dec  8 16:49:44 2024
 """
 
 import os, subprocess
-from slkConverter import slkReader
-from expandedConfig import expandedConfig
+from extra.slkConverter import slkReader
 from sharedObjects import constants
 
 class dataConstants:

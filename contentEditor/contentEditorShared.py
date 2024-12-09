@@ -5,7 +5,7 @@ Created on Mon Dec  9 13:25:18 2024
 @author: Common
 """
 
-from expandedConfig import expandedConfig
+from extra.expandedConfig import expandedConfig
 from sharedObjects import addIdentations
 
 class objectConstants:
