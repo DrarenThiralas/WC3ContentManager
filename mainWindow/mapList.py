@@ -7,7 +7,6 @@ Created on Mon Dec  9 17:52:57 2024
 
 import os
 from PyQt6.QtWidgets import QWidget, QLabel, QCheckBox, QPushButton, QGridLayout
-from contentManager.mapData import war3Map
 
 class mapListHelper:
 

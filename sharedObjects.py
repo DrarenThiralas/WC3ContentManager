@@ -25,46 +25,6 @@ class constants:
     resourceTypes = ['resource']
     defaultTypes = objTypes + triggerTypes + resourceTypes
 
-
-def addIdentations(filePath):
-    """
-    Adds identations to the multiline values in the target .ini file.
-    Otherwise ConfigParser can't read it.
-
-
-    Parameters
-    ----------
-    filePath : string
-        The path to the .ini file.
-
-    Returns
-    -------
-    None.
-
-    """
-
-    file = open(filePath, "r")
-    lines = file.readlines()
-
-    def isHeader(line):
-        return (line[0] == '[' and line[5] == ']')
-
-    def isComment(line):
-        return (line[0]=='-' and line[1] == '-')
-
-    if lines[0][0] != " ":
-        newlines = []
-        for line in lines:
-            newline = line
-            if newline.find("=") == -1 and isHeader(newline) == False and isComment(newline) == False:
-                newline = " "+newline
-            newlines.append(newline)
-        file.close()
-        file = open(filePath, "w")
-        file.writelines(newlines)
-
-    file.close()
-
 class contentContainer:
 
     def __init__(self, path):
@@ -278,6 +238,8 @@ class objectData:
 
         """
         self.path = path
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     def clearType(self, dataType):
         if self.getHasType(dataType):

@@ -5,9 +5,9 @@ Created on Sat Dec  7 15:39:13 2024
 @author: Common
 """
 
-from PyQt6.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QLineEdit, QPushButton, QDialog, QHBoxLayout, QInputDialog
+from PyQt6.QtWidgets import QTreeWidgetItem, QInputDialog
 from extra.expandedConfig import expandedConfig
-from sharedObjects import constants, objectData, addIdentations
+from sharedObjects import constants, objectData
 from contentEditor.contentEditorShared import objectConstants, metaData
 
 
@@ -16,7 +16,7 @@ class objectEditorHelper:
 
     def __init__(self, editor):
         self.editor = editor
-        self.workData = objectData("Work\\ObjectEditor")
+        self.workData = objectData("Work\\ObjectEditor")               
         self.clearObjectData()
         self.metadata = metaData()
 

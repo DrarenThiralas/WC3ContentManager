@@ -8,7 +8,6 @@ Created on Thu Apr 18 06:19:35 2024
 import os, shutil
 from extra.expandedConfig import expandedConfig
 from extra.lmlParser import lmlParser
-from sharedObjects import addIdentations
 from sharedObjects import resourceData, triggerCategory, triggerData, objectData
 
 class resourcePack(resourceData):
@@ -120,12 +119,7 @@ class objectPack(objectData):
 
         targetConfig = expandedConfig()
         targetPath = w3map.lnipath+"\\table\\"+dataType+".ini"
-        try:
-            targetConfig.read(targetPath)
-        except:
-            addIdentations(targetPath)
-            targetConfig.read(targetPath)
-
+        targetConfig.read(targetPath)
 
         sourceSections = sourceConfig.sections()
 

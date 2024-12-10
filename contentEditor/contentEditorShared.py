@@ -6,7 +6,6 @@ Created on Mon Dec  9 13:25:18 2024
 """
 
 from extra.expandedConfig import expandedConfig
-from sharedObjects import addIdentations
 
 class objectConstants:
     metaDataFiles = ['UnitMetaData.ini',
@@ -48,20 +47,12 @@ class metaData:
     def loadMetaData(self):
         for file in objectConstants.metaDataFiles:
             self.configs[file] = expandedConfig()
-            try:
-                self.configs[file].read('Data\\'+file)
-            except:
-                addIdentations('Data\\'+file)
-                self.configs[file].read('Data\\'+file)
+            self.configs[file].read('Data\\'+file)
 
     def loadStringData(self):
         for file in objectConstants.stringDataFiles:
             self.strconfs[file] = expandedConfig()
-            try:
-                self.strconfs[file].read('Data\\'+file)
-            except:
-                addIdentations('Data\\'+file)
-                self.strconfs[file].read('Data\\'+file)
+            self.strconfs[file].read('Data\\'+file)
 
     def get(self, field):
 

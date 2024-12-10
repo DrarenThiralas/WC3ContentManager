@@ -5,7 +5,7 @@ Created on Thu Apr 18 06:24:31 2024
 @author: maxer
 """
 
-from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout, QProgressDialog
+from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 from mainWindow.mainWindowHelper import mainWindowHelper
