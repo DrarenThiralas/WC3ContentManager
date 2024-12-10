@@ -302,6 +302,7 @@ class objectData:
         sourceConfig = None
         if os.path.exists(sourcePath):
 
+            print('getting config for '+sourcePath)
             sourceConfig = expandedConfig()
 
             try:

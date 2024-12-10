@@ -6,7 +6,7 @@ Created on Thu Apr 18 06:25:00 2024
 """
 import os, shutil
 from extra.expandedConfig import expandedConfig
-from PyQt6.QtWidgets import QFileDialog, QGridLayout, QCheckBox, QProgressDialog, QInputDialog, QLabel, QPushButton
+from PyQt6.QtWidgets import QFileDialog, QCheckBox, QProgressDialog, QInputDialog, QLabel
 from PyQt6.QtCore import Qt
 from contentManager.contentPack import contentPack
 from contentManager.mapData import war3Map
@@ -145,64 +145,19 @@ class mainWindowHelper:
 
         """
 
-        file = str(QFileDialog.getOpenFileNames(None, "Select Maps")[0])
-        self.window.mapsPathInput.setText(file)
+        fileList = QFileDialog.getOpenFileNames(None, "Select Maps")[0]
+        print('file list: '+str(fileList))
+        self.window.openMaps = [war3Map(file) for file in fileList]
+        for openMap in self.window.openMaps:
+            openMap.unpack(True)
+        self.window.mapList.refresh()
 
-    def importContentPacks(self):
-        """
-        The function that populates the content pack checklist.
-        Scans the ContentPacks subdirectory.
+    def clearWork(self):
 
-        Returns
-        -------
-        None.
-
-        """
-
-        layout = QGridLayout()
-
-        if not os.path.exists("ContentPacks\\"):
-            os.makedirs("ContentPacks\\")
-
-        contentPacks = os.scandir("ContentPacks\\")
-        i = 0
-        for pack in contentPacks:
-            if pack.is_dir():
-                checkbox = QCheckBox(str(pack.name))
-                editButton = QPushButton("Edit")
-                packName = checkbox.text()
-                functionFactory = lambda x: lambda: self.openContentEditor(contentPack("ContentPacks\\"+x).data)
-                editButton.clicked.connect(functionFactory(packName))
-                layout.addWidget(checkbox, i, 0)
-                layout.addWidget(editButton, i, 1)
-                i+=1
-
-        geometry = (40, 40, 320, 40*i)
-
-        return geometry, layout
-
-    def getActivePacks(self):
-        """
-        The function that returns the currently active content packs from the checklist.
-
-        Returns
-        -------
-        activePacks : list of contentPack objects
-
-        """
-
-        activePacks = []
-
-        layout = self.window.packSelectorSpace.layout()
-
-        index = layout.count()-1
-        while(index >= 0):
-            myWidget = layout.itemAt(index).widget()
-            if myWidget.isChecked():
-                activePacks.append(contentPack("ContentPacks\\"+myWidget.text()))
-            index -=1
-
-        return activePacks
+        if os.path.exists("Work\\"):
+            workfolders = os.scandir("Work\\")
+            for entry in workfolders:
+                os.remove(entry.path)
 
     def executeFunction(self):
         """
@@ -215,7 +170,7 @@ class mainWindowHelper:
 
         """
 
-        contentPacks = self.getActivePacks()
+        contentPacks = self.window.packList.helper.getActivePacks()
         maps = list(str(self.window.mapsPathInput.text())[:-1].split(','))
         maps = [mp[2:-1] for mp in maps]
         maps = [war3Map(mp) for mp in maps]
@@ -310,4 +265,4 @@ class mainWindowHelper:
     def finalizeContentPack(self):
 
         self.window.resultMsg.setText("New content pack created!")
-        self.importContentPacks()
+        self.window.packList.refresh()

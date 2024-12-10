@@ -29,6 +29,9 @@ class war3Map:
         self.lnipath = None
         self.data = None
 
+    def __str__(self):
+        return self.name
+
     def backup(self):
         """
         Makes a backup of the map in the Backup subfolder.
@@ -43,7 +46,7 @@ class war3Map:
 
     def unpack(self, debug = False):
         """
-        Unpacks the map into a lni object, stored in the Temp subfolder.
+        Unpacks the map into a lni object, stored in the Work subfolder.
 
         Returns
         -------
@@ -57,7 +60,7 @@ class war3Map:
             print(message)
 
         self.backup()
-        self.lnipath = "Temp\\"+self.name+"_tmp"
+        self.lnipath = "Work\\Maps\\"+self.name+"_w3x"
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.getGlobalOption('w3x2lni'))
 
@@ -89,3 +92,18 @@ class war3Map:
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = constants.getGlobalOption('w3x2lni'))
         return self
+
+    def close(self):
+        """
+        Deletes the unpacked map folder, reversing the effect of unpack().
+
+        Returns
+        -------
+        self
+
+        """
+
+        if self.lnipath != None and os.path.exists(self.lnipath):
+            os.remove(self.lnipath)
+        self.lnipath = None
+        self.data = None

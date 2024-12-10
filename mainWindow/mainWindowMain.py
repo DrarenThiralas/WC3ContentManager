@@ -9,6 +9,8 @@ from PyQt6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QDialog, QG
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 from mainWindow.mainWindowHelper import mainWindowHelper
+from mainWindow.contentPackList import contentPackList
+from mainWindow.mapList import mapList
 
 from contentEditor.contentEditorWindow import contentEditorWindow
 
@@ -27,8 +29,10 @@ class mainWindow:
         self.initWindow()
         self.helper.checkConfig()
         self.helper.checkData()
+        self.openMaps = None
         self.initMapSelector()
-        self.initPackSelector()
+        self.packList = contentPackList(self)
+        self.mapList = mapList(self)
         self.initResMsg()
         self.initContentEditor()
         self.initExecuteButton()
@@ -54,23 +58,6 @@ class mainWindow:
         self.selectMapsButton = QPushButton(text='Select Map Files', parent=self.window)
         self.selectMapsButton.setGeometry(30, 100, 180, 30)
         self.selectMapsButton.clicked.connect(self.helper.selectMapsFunction)
-
-    def initPackSelector(self):
-
-        self.packSelectorSpace = QWidget(parent=self.window)
-        self.packSelectorSpace.setGeometry(480, 120, 400, 500)
-        self.packSelectorHeader = QLabel(parent=self.packSelectorSpace)
-        self.packSelectorHeader.setGeometry(40, 10, 240, 40)
-        self.packSelector = QWidget(parent=self.packSelectorSpace)
-        geometry, layout = self.helper.importContentPacks()
-
-        if geometry[3] > 0:
-            self.packSelectorHeader.setText("Content Packs:")
-        else:
-            self.packSelectorHeader.setText("No Content Packs Found!")
-
-        self.packSelector.setGeometry(*geometry)
-        self.packSelector.setLayout(layout)
 
     def initResMsg(self):
 
