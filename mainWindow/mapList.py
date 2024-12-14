@@ -7,11 +7,41 @@ Created on Mon Dec  9 17:52:57 2024
 
 import os
 from PyQt6.QtWidgets import QWidget, QLabel, QCheckBox, QPushButton, QGridLayout
+from contentManager.mapData import war3Map
+
+
+class openMaps:
+    
+    def __init__(self, maps):
+        self.maps = None
+        self.mapFilePath = "Work\\openmaps.txt"
+        self.loadMaps()
+        
+    def loadMaps(self):
+        with open(self.mapFilePath, 'r') as mapFile:
+            lines = mapFile.readline()
+            names = [line.split('\\')[-1][:-4] for line in lines]
+            lnis = ['Work\\Maps\\'+name+'_w3x' for name in names]
+            maps = [war3Map(line, lni) for line, lni in zip(lines, lnis)]       
+            self.setMaps(maps)
+            mapFile.close()
+        
+    def setMaps(self, maps):
+        self.maps = maps
+        with open(self.mapFilePath, 'w') as mapFile:
+            mapFile.writelines([mp.w3xpath for mp in maps])
+            mapFile.close()
+                    
+    def closeMap(self, mp):
+        self.maps.remove(mp)
+        self.setMaps(self.maps)
+        mp.close()
 
 class mapListHelper:
 
     def __init__(self, mapList):
         self.mapList = mapList
+        self.openMaps = openMaps()
 
     def importMaps(self):
         """
@@ -25,7 +55,7 @@ class mapListHelper:
 
         layout = QGridLayout()
 
-        maps = self.mapList.window.openMaps
+        maps = self.openMaps
         i = 0
         if maps != None:
             for mp in maps:

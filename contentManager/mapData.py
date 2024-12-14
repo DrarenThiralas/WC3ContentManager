@@ -10,7 +10,7 @@ from sharedObjects import triggerData, objectData, resourceData, contentContaine
 
 class war3Map:
 
-    def __init__(self, mapPath):
+    def __init__(self, mapPath, lniPath = None):
         """
         Initializes a new war3Map object.
 
@@ -18,6 +18,8 @@ class war3Map:
         ----------
         mapPath : string
             Path to the map's .w3x file.
+        lniPath: string, default = None
+            Path to the map's lni folder, if the map is unpacked already.
 
         Returns
         -------
@@ -26,8 +28,8 @@ class war3Map:
         """
         self.w3xpath = mapPath
         self.name = mapPath.split('/')[-1][:-4]
-        self.lnipath = None
-        self.data = None
+        self.lnipath = lniPath
+        self.data = self.initData()
 
     def __str__(self):
         return self.name
@@ -43,6 +45,14 @@ class war3Map:
         """
         shutil.copy(self.w3xpath, "Backup\\"+self.name+".w3x")
         return self
+    
+    def initData(self):
+        
+        if self.lnipath != None:
+            self.data = contentContainer(self.lnipath)
+            self.data.triggerData = triggerData(self.lnipath+'\\trigger')
+            self.data.objData = objectData(self.lnipath)
+            self.data.resourceData = resourceData(self.lnipath)
 
     def unpack(self, debug = False):
         """
@@ -63,11 +73,8 @@ class war3Map:
         self.lnipath = "Work\\Maps\\"+self.name+"_w3x"
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.getGlobalOption('w3x2lni'))
-
-        self.data = contentContainer(self.lnipath)
-        self.data.triggerData = triggerData(self.lnipath+'\\trigger')
-        self.data.objData = objectData(self.lnipath)
-        self.data.resourceData = resourceData(self.lnipath)
+        
+        self.initData()
 
         return self
 

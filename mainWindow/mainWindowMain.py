@@ -29,7 +29,6 @@ class mainWindow:
         self.initWindow()
         self.helper.checkConfig()
         self.helper.checkData()
-        self.openMaps = None
         self.initMapSelector()
         self.packList = contentPackList(self)
         self.mapList = mapList(self)
