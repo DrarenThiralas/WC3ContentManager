@@ -5,7 +5,7 @@ Created on Sat Apr 13 03:34:10 2024
 @author: maxer
 """
 
-import os
+import os, shutil
 from sharedObjects import constants, contentContainer
 from contentManager.contentPackParts import objectPack, triggerPack, resourcePack
 
@@ -90,3 +90,6 @@ class contentPack:
             self.data.resourceData.apply(w3map)
 
         return w3map
+
+    def delete(self):
+        shutil.rmtree(self.path)

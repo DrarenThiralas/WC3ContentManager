@@ -31,6 +31,10 @@ class mainWindowHelper:
         """
         self.window = window
 
+    def getActivePacks(self):
+
+        return self.window.packList.helper.getActivePacks()
+
     def checkConfig(self):
         """
         Checks that the config exists, and is valid. Promts the user to fix it if not.
@@ -170,7 +174,7 @@ class mainWindowHelper:
 
         """
 
-        contentPacks = self.window.packList.helper.getActivePacks()
+        contentPacks = self.getActivePacks()
         maps = list(str(self.window.mapsPathInput.text())[:-1].split(','))
         maps = [mp[2:-1] for mp in maps]
         maps = [war3Map(mp) for mp in maps]
@@ -210,7 +214,6 @@ class mainWindowHelper:
 
         self.window.contentEditor.window.open()
         self.window.contentEditor.setContent(content)
-
 
     def selectMapFunction(self):
 

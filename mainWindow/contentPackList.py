@@ -6,13 +6,16 @@ Created on Mon Dec  9 14:02:57 2024
 """
 
 import os
-from PyQt6.QtWidgets import QWidget, QLabel, QCheckBox, QPushButton, QGridLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QCheckBox, QPushButton, QGridLayout, QMessageBox
 from contentManager.contentPack import contentPack
 
 class contentPackListHelper:
 
     def __init__(self, packList):
         self.packList = packList
+
+    def openContentEditor(self, packName):
+        self.packList.window.helper.openContentEditor(contentPack("ContentPacks\\"+packName).data)
 
     def importContentPacks(self):
         """
@@ -38,8 +41,10 @@ class contentPackListHelper:
                 editButton = QPushButton("Edit")
                 deleteButton = QPushButton("Delete")
                 packName = checkbox.text()
-                functionFactory = lambda x: lambda: self.packList.window.helper.openContentEditor(contentPack("ContentPacks\\"+x).data)
+                functionFactory = lambda x: lambda: self.openContentEditor(x)
+                functionFactory2 = lambda x: lambda: self.deletePack(x)
                 editButton.clicked.connect(functionFactory(packName))
+                deleteButton.clicked.connect(functionFactory2(packName))
                 layout.addWidget(checkbox, i, 0)
                 layout.addWidget(editButton, i, 1)
                 layout.addWidget(deleteButton, i, 2)
@@ -48,6 +53,12 @@ class contentPackListHelper:
         geometry = (40, 40, 320, 40*i)
 
         return geometry, layout
+
+    def deletePack(self, packName):
+        confirm = QMessageBox.warning(self.packList.window.window, "Confirm Delete", "Are you sure you want to delete the content pack "+packName+"?", QMessageBox.StandardButton.No | QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+        if confirm == QMessageBox.StandardButton.Yes:
+            contentPack("ContentPacks\\"+packName).delete()
+            self.packList.refresh()
 
     def getActivePacks(self):
         """
