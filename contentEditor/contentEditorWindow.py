@@ -7,6 +7,7 @@ Created on Fri Dec  6 14:30:16 2024
 
 from PyQt6.QtWidgets import QPushButton, QDialog, QTabWidget
 from contentEditor.objectEditor.objectEditorMain import objectEditor
+from contentEditor.triggerEditor.triggerEditorMain import triggerEditor
 
 class contentEditorHelper:
 
@@ -48,3 +49,7 @@ class contentEditorWindow:
     def initObjectEditor(self):
         self.objectEditor = objectEditor()
         self.tabSpace.addTab(self.objectEditor.space, "Objects")
+
+    def initTriggerEditor(self):
+        self.triggerEditor = triggerEditor()
+        self.tabSpace.addTab(self.triggerEditor.space, "Objects")
