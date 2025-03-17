@@ -5,7 +5,7 @@ Created on Wed Apr 17 04:50:04 2024
 @author: maxer
 """
 
-import os
+import os, shutil
 from extra.expandedConfig import expandedConfig
 from extra.lmlParser import lmlParser, lmlLine, lmlEntry
 
@@ -156,6 +156,11 @@ class triggerCategory:
         self.triggers = [trigger(self.path+'\\'+f.name) for f in os.scandir(self.path) if f.name != 'catalog.lml']
 
 
+    def clear(self):
+        if os.path.exists(self.path):
+            shutil.rmtree(self.path)
+
+
 
 class triggerData:
 
@@ -181,7 +186,25 @@ class triggerData:
         self.path = path
         self.customScript = self.path+'\\code.j'
         self.varFile = self.path+"\\variable.lml"
+        self.initCategories()
+
+
+    def initCategories(self):
         self.categories = [triggerCategory(self.path+'\\'+folder.name) for folder in os.scandir(self.path) if folder.is_dir()]
+
+    def clear(self):
+        if os.path.exists(self.customScript):
+            os.remove(self.customScript)
+        if os.path.exists(self.varFile):
+            os.remove(self.varFile)
+        for category in self.categories:
+            category.clear()
+        self.initCategories()
+
+    def mergeData(self, newData):
+
+        """
+        """
 
     def getVars(self):
 
@@ -267,11 +290,7 @@ class objectData:
             print('getting config for '+sourcePath)
             sourceConfig = expandedConfig()
 
-            try:
-                sourceConfig.read(sourcePath)
-            except:
-                addIdentations(sourcePath)
-                sourceConfig.read(sourcePath)
+            sourceConfig.read(sourcePath)
 
         return sourceConfig
 

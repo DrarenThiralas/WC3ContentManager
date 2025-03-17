@@ -147,17 +147,17 @@ class mainWindowHelper:
 
         fileList = QFileDialog.getOpenFileNames(None, "Select Maps")[0]
         print('file list: '+str(fileList))
-        self.window.openMaps = [war3Map(file) for file in fileList]
-        for openMap in self.window.openMaps:
+        maps = [war3Map(file) for file in fileList]
+        self.clearWork("Maps")
+        for openMap in maps:
             openMap.unpack(True)
+        self.window.mapList.helper.openMaps.setMaps(maps)
         self.window.mapList.refresh()
 
-    def clearWork(self):
+    def clearWork(self, name):
 
-        if os.path.exists("Work\\"):
-            workfolders = os.scandir("Work\\")
-            for entry in workfolders:
-                os.remove(entry.path)
+        if os.path.exists("Work\\"+name):
+            shutil.rmtree("Work\\"+name)
 
     def executeFunction(self):
         """

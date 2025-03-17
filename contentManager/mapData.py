@@ -45,9 +45,9 @@ class war3Map:
         """
         shutil.copy(self.w3xpath, "Backup\\"+self.name+".w3x")
         return self
-    
+
     def initData(self):
-        
+
         if self.lnipath != None:
             self.data = contentContainer(self.lnipath)
             self.data.triggerData = triggerData(self.lnipath+'\\trigger')
@@ -73,7 +73,7 @@ class war3Map:
         self.lnipath = "Work\\Maps\\"+self.name+"_w3x"
         cwd = os.getcwd()
         subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.getGlobalOption('w3x2lni'))
-        
+
         self.initData()
 
         return self
@@ -111,6 +111,6 @@ class war3Map:
         """
 
         if self.lnipath != None and os.path.exists(self.lnipath):
-            os.remove(self.lnipath)
+            shutil.rmtree(self.lnipath)
         self.lnipath = None
         self.data = None

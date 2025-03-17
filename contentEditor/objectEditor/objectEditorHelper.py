@@ -16,7 +16,7 @@ class objectEditorHelper:
 
     def __init__(self, editor):
         self.editor = editor
-        self.workData = objectData("Work\\ObjectEditor")               
+        self.workData = objectData("Work\\ObjectEditor")
         self.clearObjectData()
         self.metadata = metaData()
 
@@ -41,7 +41,7 @@ class objectEditorHelper:
         metadata = self.metadata.get(field)
         if metadata != None:
             name = metadata['displayname'][1:-1]
-            if name[:8] == "WESTRING":
+            while name[:8] == "WESTRING":
                 name = self.metadata.applyStringLocal(name)
             fieldType = metadata['type'][1:-1]
             category = metadata['category'][1:-1]
