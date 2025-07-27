@@ -190,7 +190,8 @@ class triggerData:
 
 
     def initCategories(self):
-        self.categories = [triggerCategory(self.path+'\\'+folder.name) for folder in os.scandir(self.path) if folder.is_dir()]
+        if os.path.exists(self.path):
+            self.categories = [triggerCategory(self.path+'\\'+folder.name) for folder in os.scandir(self.path) if folder.is_dir()]
 
     def clear(self):
         if os.path.exists(self.customScript):

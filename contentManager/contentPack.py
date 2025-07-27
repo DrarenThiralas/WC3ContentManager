@@ -6,7 +6,7 @@ Created on Sat Apr 13 03:34:10 2024
 """
 
 import os, shutil
-from sharedObjects import constants, contentContainer
+from extra.sharedObjects import constants, contentContainer
 from contentManager.contentPackParts import objectPack, triggerPack, resourcePack
 
 class contentPack:

@@ -7,7 +7,7 @@ Created on Sat Dec  7 15:39:13 2024
 
 from PyQt6.QtWidgets import QTreeWidgetItem, QInputDialog
 from extra.expandedConfig import expandedConfig
-from sharedObjects import constants, triggerData
+from extra.sharedObjects import constants, triggerData
 from contentEditor.contentEditorShared import objectConstants, metaData
 
 class triggerEditorHelper:

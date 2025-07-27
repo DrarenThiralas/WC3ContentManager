@@ -6,7 +6,7 @@ Created on Sat Apr 13 03:09:20 2024
 """
 
 import subprocess, shutil, os
-from sharedObjects import triggerData, objectData, resourceData, contentContainer, constants
+from extra.sharedObjects import triggerData, objectData, resourceData, contentContainer, constants
 
 class war3Map:
 

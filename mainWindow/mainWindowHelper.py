@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import QFileDialog, QCheckBox, QProgressDialog, QInputDialo
 from PyQt6.QtCore import Qt
 from contentManager.contentPack import contentPack
 from contentManager.mapData import war3Map
-from sharedObjects import constants
+from extra.sharedObjects import constants
 from extra.mpqExtractor import dataConstants, dataMaker
 
 class mainWindowHelper:

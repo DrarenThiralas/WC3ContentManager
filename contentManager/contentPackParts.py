@@ -8,7 +8,7 @@ Created on Thu Apr 18 06:19:35 2024
 import os, shutil
 from extra.expandedConfig import expandedConfig
 from extra.lmlParser import lmlParser
-from sharedObjects import resourceData, triggerCategory, triggerData, objectData
+from extra.sharedObjects import resourceData, triggerCategory, triggerData, objectData
 
 class resourcePack(resourceData):
 

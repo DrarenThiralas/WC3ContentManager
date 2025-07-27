@@ -7,7 +7,7 @@ Created on Sun Dec  8 16:49:44 2024
 
 import os, subprocess
 from extra.slkConverter import slkReader
-from sharedObjects import constants
+from extra.sharedObjects import constants
 
 class dataConstants:
 
