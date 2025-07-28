@@ -5,7 +5,7 @@ Created on Sun Dec  8 16:49:44 2024
 @author: Common
 """
 
-import os, subprocess
+from extra.StormLib.StormLib import mpq
 from extra.slkConverter import slkReader
 from extra.sharedObjects import constants
 
@@ -24,12 +24,14 @@ class dataConstants:
 class dataMaker:
 
     def __init__(self, mpqName):
-        self.mpq = constants.getGlobalOption('war3')+'\\'+mpqName
+        self.path = constants.getGlobalOption('war3')+'\\'+mpqName
+        self.mpq = mpq(self.path)
 
     def extract(self, file, target = 'Temp'):
         print('extracting '+file)
-        cwd = os.getcwd()
-        subprocess.run(["cmd", '/c', "MPQEditor.exe", "extract", self.mpq, file, cwd+"\\"+target, '/fp'], cwd = constants.getGlobalOption('mpqedit'))
+        self.mpq.ex(file, target+'\\'+file)
+        #cwd = os.getcwd()
+        #subprocess.run(["cmd", '/c', "MPQEditor.exe", "extract", self.mpq, file, cwd+"\\"+target, '/fp'], cwd = constants.getGlobalOption('mpqedit'))
         #subprocess.run(["cmd", '/c', "MPQEditor.exe", string], cwd = constants.getGlobalOption('mpqedit'))
         return target+"\\"+file
 

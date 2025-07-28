@@ -8,28 +8,24 @@ Created on Sat Apr 13 03:09:20 2024
 import subprocess, shutil, os
 from extra.sharedObjects import triggerData, objectData, resourceData, contentContainer, constants
 
-class war3Map:
+class war3Data:
 
-    def __init__(self, mapPath, lniPath = None):
+    def __init__(self, path):
         """
-        Initializes a new war3Map object.
+        Initializes a new war3Data object.
 
         Parameters
         ----------
-        mapPath : string
-            Path to the map's .w3x file.
-        lniPath: string, default = None
-            Path to the map's lni folder, if the map is unpacked already.
-
+        path : string
+            Path to the data files.
+            
         Returns
         -------
         None.
 
         """
-        self.w3xpath = mapPath
-        self.name = mapPath.split('/')[-1][:-4]
-        self.lnipath = lniPath
-        self.data = self.initData()
+        self.path = path
+        self.name = path.split('/')[-1][:-4]
 
     def __str__(self):
         return self.name
@@ -43,7 +39,7 @@ class war3Map:
         self
 
         """
-        shutil.copy(self.w3xpath, "Backup\\"+self.name+".w3x")
+        shutil.copy(self.path, "Backup\\"+self.path.split('/')[-1])
         return self
 
     def initData(self):
@@ -54,29 +50,6 @@ class war3Map:
             self.data.objData = objectData(self.lnipath)
             self.data.resourceData = resourceData(self.lnipath)
 
-    def unpack(self, debug = False):
-        """
-        Unpacks the map into a lni object, stored in the Work subfolder.
-
-        Returns
-        -------
-        self
-
-        """
-
-        message = "Unpacking map: "+self.name
-
-        if debug:
-            print(message)
-
-        self.backup()
-        self.lnipath = "Work\\Maps\\"+self.name+"_w3x"
-        cwd = os.getcwd()
-        subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.getGlobalOption('w3x2lni'))
-
-        self.initData()
-
-        return self
 
     def pack(self, debug = False, cleanVars = True):
         """
@@ -110,7 +83,40 @@ class war3Map:
 
         """
 
-        if self.lnipath != None and os.path.exists(self.lnipath):
-            shutil.rmtree(self.lnipath)
-        self.lnipath = None
+        if self.path != None and os.path.exists(self.path):
+            shutil.rmtree(self.path)
+        self.path = None
         self.data = None
+        
+class war3DataRaw(war3Data):
+    
+    def __init__(self, path):
+        war3Data.init(self, path)
+        
+    def __str__(self):
+        return self.name
+    
+    def backup(self):
+        war3Data.backup(self)
+        
+    def close(self):
+        war3Data.close(self)
+        
+    def unpack(self, lnipath, debug = False):
+        
+        message = "Unpacking data: "+self.name
+        if debug:
+            print(message)
+
+        self.backup()
+    
+    def toLni(self, debug = False):
+        lnipath = self.path[:-4]+"_lni"
+        self.unpack(lnipath, debug)
+        return war3DataLni(lnipath)
+        
+class war3DataLni(war3Data):
+    
+    def __init__(self, path):
+        war3Data.init(self, path)
+        self.data = self.initData()

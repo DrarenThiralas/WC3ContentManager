@@ -24,6 +24,44 @@ class constants:
     triggerTypes = ['trigger', 'customscript', 'vars']
     resourceTypes = ['resource']
     defaultTypes = objTypes + triggerTypes + resourceTypes
+    
+    mapImports = 'war3map.imp' # Import List, Editor Only
+    mapScript = 'war3map.j' # Map Script
+    mapTriggerParts = [
+        'war3map.wtg',# Trigger Data (GUI)
+        'war3map.wct',# Trigger Data (JASS)
+        'war3map.wts'# Trigger Strings
+        ]
+    mapCustomDataParts = [
+        'war3map.w3u',# Custom Unit Data
+        'war3map.w3t',# Custom Item Data
+        'war3map.w3b',# Custom Destructible Data
+        'war3map.w3d',# Custom Doodad Data
+        'war3map.w3a',# Custom Ability Data
+        'war3map.w3h',# Custom Buff Data
+        'war3map.w3q'# Custom Upgrade Data
+        ]
+    mapTerrainParts = [
+        'war3map.w3e',# Tileset Data
+        'war3map.shd',# Shadow Data
+        'war3map.wpm',# Pathing Data
+        'war3map.doo',# Doodad Placement Data
+        'war3mapUnits.doo',#Unit and Item Placement Data, Editor Only
+        'war3mapMap.blp',#  Minimap Image
+        'war3map.mmp'# Minimap Icon Data
+        ]
+    mapMiscParts = [
+        'war3map.w3i',# Map Info
+        'war3map.w3c',# Camera Data, Editor Only
+        'war3map.w3r',# Region Data, Editor Only
+        'war3map.w3s',# Sound Data, Editor Only
+        'war3map.wai',# AI Data
+        'war3mapMisc.txt',# Gameplay Constants
+        'war3mapSkin.txt',# Game Interface
+        'war3mapExtra.txt'# Custom Sky Data
+        ]
+    
+    mapParts = [mapImports, mapScript] + mapTriggerParts + mapCustomDataParts + mapTerrainParts + mapMiscParts
 
 class contentContainer:
 
