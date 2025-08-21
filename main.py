@@ -22,7 +22,7 @@ print(test2.getData())
 
 test3 = customdata('.\\test2_w3x\\war3map.w3u', 'unit')
 for obj in test3.getData():
-    obj.toLni('.\\test2_lni\\'+obj.id+'.txt')
+    obj.toYml('.\\test2_lni')
 
 #app = QApplication([])
 #mainWin = mainWindow()
