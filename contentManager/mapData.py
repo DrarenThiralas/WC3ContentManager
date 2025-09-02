@@ -43,6 +43,8 @@ class war3Map:
         self
 
         """
+        #print("Backing up map: "+self.w3xpath)
+        #print("Lnipath: "+self.lnipath)
         shutil.copy(self.w3xpath, "Backup\\"+self.name+".w3x")
         return self
 

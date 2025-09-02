@@ -35,7 +35,7 @@ class expandedConfig(configparser.ConfigParser):
                     cfgNew.set(section, option, cfg[section][option])
         return cfgNew
     
-    def addIdentations(filePath):
+    def addIdentations(self, filePath):
         """
         Adds identations to the multiline values in the target .ini file.
         Otherwise ConfigParser can't read it.
@@ -78,5 +78,6 @@ class expandedConfig(configparser.ConfigParser):
         try:
             configparser.ConfigParser.read(self, file)
         except:
+            print(file)
             self.addIdentations(file)
             configparser.ConfigParser.read(self, file)
