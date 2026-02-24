@@ -6,7 +6,7 @@ Created on Thu Apr 18 06:25:00 2024
 """
 import os, shutil
 from extra.expandedConfig import expandedConfig
-from PyQt6.QtWidgets import QFileDialog, QCheckBox, QProgressDialog, QInputDialog, QLabel
+from PyQt6.QtWidgets import QFileDialog, QCheckBox, QProgressDialog, QInputDialog, QLabel, QMessageBox
 from PyQt6.QtCore import Qt
 from contentManager.contentPack import contentPack
 from contentManager.mapData import war3Map
@@ -89,6 +89,7 @@ class mainWindowHelper:
             newConfig.add_section("Settings")
 
         def folderSelect(tooltip, setting):
+            QMessageBox(QMessageBox.Icon.Question, "Error", tooltip).exec()
             folder = QFileDialog.getExistingDirectory(self.window.window, tooltip)
             newConfig["Settings"][setting] = folder
             with open(configPath, 'w') as configfile:
@@ -175,9 +176,10 @@ class mainWindowHelper:
         """
 
         contentPacks = self.getActivePacks()
-        maps = list(str(self.window.mapsPathInput.text())[:-1].split(','))
-        maps = [mp[2:-1] for mp in maps]
-        maps = [war3Map(mp) for mp in maps]
+        maps = self.window.mapList.helper.openMaps.getActiveMaps()
+        #maps = list(str(self.window.mapsPathInput.text())[:-1].split(','))
+        #maps = [mp[2:-1] for mp in maps]
+        #maps = [war3Map(mp) for mp in maps]
 
         progressTotal = 3*len(maps)+2
         progressDialog = QProgressDialog("Initializing...", "Cancel", 0, progressTotal)

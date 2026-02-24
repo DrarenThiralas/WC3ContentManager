@@ -12,10 +12,11 @@ from contentManager.mapData import war3Map
 
 class openMaps:
 
-    def __init__(self):
+    def __init__(self, mapList):
+        self.mapList = mapList
         self.maps = None
+        self.activeMaps = None
         self.mapFilePath = "Work\\openmaps.txt"
-        self.loadMaps()
 
     def loadMaps(self):
         print('loading maps')
@@ -37,12 +38,38 @@ class openMaps:
                 mapFile.close()
 
         self.setMaps(maps)
+        
+    def getActiveMaps(self):
+        """
+        The function that returns the currently active maps from the checklist.
+
+        Returns
+        -------
+        activeMaps : list of war3Map objects
+
+        """
+
+        activeMaps = []
+
+        layout = self.mapList.mapSelector.layout()
+
+        index = layout.count()-1
+        while(index >= 0):
+            checkbox = layout.itemAt(index).widget()
+            if checkbox.isChecked():
+                print("Adding active map: "+str(index//2))
+                activeMaps.append(self.maps[index//2])
+            index -=1
+
+        return activeMaps
 
     def setMaps(self, maps):
         self.maps = maps
+        self.activeMaps = [False for mp in maps]
         with open(self.mapFilePath, 'w') as mapFile:
             mapFile.writelines([mp.w3xpath+"\n" for mp in maps])
             mapFile.close()
+        self.mapList.refresh()
 
     def closeMap(self, mp):
         self.maps.remove(mp)
@@ -53,7 +80,7 @@ class mapListHelper:
 
     def __init__(self, mapList):
         self.mapList = mapList
-        self.openMaps = openMaps()
+        self.openMaps = openMaps(mapList)
 
     def importMaps(self):
         """
@@ -90,13 +117,15 @@ class mapListHelper:
 class mapList:
 
     def __init__(self, window):
+        self.mapSpace = None
         self.window = window
         self.helper = mapListHelper(self)
-        self.mapSpace = None
         self.initMapList()
 
     def initMapList(self):
         parent = self.window.window
+        if self.helper.openMaps.maps == None:
+            self.helper.openMaps.loadMaps()
         if self.mapSpace != None:
             self.mapSpace.setParent(None)
         self.mapSpace = QWidget(parent = parent)
