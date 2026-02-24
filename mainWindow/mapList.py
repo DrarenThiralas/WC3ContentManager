@@ -58,7 +58,7 @@ class openMaps:
             checkbox = layout.itemAt(index).widget()
             if checkbox.isChecked():
                 print("Adding active map: "+str(index//2))
-                activeMaps.append(self.maps[index])
+                activeMaps.append(self.maps[index//2])
             index -=1
 
         return activeMaps
