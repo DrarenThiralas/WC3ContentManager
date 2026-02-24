@@ -5,7 +5,7 @@ Created on Sat Jul 12 19:49:31 2025
 @author: Common
 """
 
-import ctypes, os
+import ctypes, ctypes.wintypes, os
 from extra.sharedObjects import constants
 from extra.war3MapParsers.imports import imports
 

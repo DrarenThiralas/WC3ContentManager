@@ -59,5 +59,5 @@ class war3Object:
         file.close()
         
     def toYml(self, path):
-        with open(path+'//'+self.d['id']+'.yml', 'w') as outfile:
+        with open(path+'\\'+self.d['id']+'.yml', 'w') as outfile:
             yaml.dump(self.d, outfile, default_flow_style=False)
