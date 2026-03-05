@@ -5,7 +5,7 @@ Created on Fri Apr 12 18:12:14 2024
 @author: maxer
 """
 
-import sys
+import sys, os
 #from PyQt6.QtWidgets import QApplication
 #from mainWindow.mainWindowMain import mainWindow
 from extra.StormLib.StormLib import w3x
@@ -17,12 +17,17 @@ test.op()
 test.ex_all('.\\test2_w3x')
 test.cl()
 
-test2 = strings('.\\test2_w3x\\war3map.wts')
-print(test2.getData())
+#test2 = strings('.\\test2_w3x\\war3map.wts')
+#print(test2.getData())
 
 test3 = customdata('.\\test2_w3x\\war3map.w3u', 'unit')
+if not os.path.exists('.\\test2_lni'):
+    os.mkdir('.\\test2_lni')
 for obj in test3.getData():
     obj.toYml('.\\test2_lni')
+    
+test4 = w3x(".\\test2_new.w3x")
+test4.pack(".\\test2_w3x")
 
 #app = QApplication([])
 #mainWin = mainWindow()

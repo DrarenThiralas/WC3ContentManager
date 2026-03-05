@@ -31,6 +31,25 @@ class mpq:
         stormLib.lib.SFileExtractFile(self.handle, cfile, ctarget, d0)
         return os.path.exists(target)
     
+    def cr(self, size):
+        print("creating archive file "+self.path)
+        cpath = ctypes.c_wchar_p(self.path)
+        d0 = ctypes.wintypes.DWORD(size)
+        dflags = ctypes.wintypes.DWORD(0x00100000 + 0x00200000)
+        stormLib.lib.SFileCreateArchive(cpath, dflags, d0, ctypes.byref(self.handle))
+        
+    def ad(self, file, target):
+        print("adding "+file+" as "+target)
+        d0 = ctypes.wintypes.DWORD(0x80000000+0x00000200)
+        d2 = ctypes.wintypes.DWORD(0x02)
+        df = ctypes.wintypes.DWORD(0xFFFFFFFF)
+        cfile = ctypes.c_wchar_p(file)
+        ctarget = ctypes.c_char_p(target.encode(encoding="ASCII"))
+        stormLib.lib.SFileAddFileEx(self.handle, cfile, ctarget, d0, d2, df)
+        #centries = (ctypes.c_char_p*1)(*[ctarget])
+        #stormLib.lib.SFileAddListFileEntries(self.handle, centries, ctypes.wintypes.DWORD(1))
+        
+    
 class w3x(mpq):
     def __init__(self, path):
         mpq.__init__(self, path)
@@ -38,22 +57,44 @@ class w3x(mpq):
         mpq.op(self)
     def cl(self):
         mpq.cl(self)
-    def ex(self, file, target):
-        mpq.ex(self, file, target)
+    def ex(self, file, path):
+        # Ensure that target folder exists
+        if not os.path.exists(path+"\\"+file[:-len(file.split("\\")[-1])]):
+            os.makedirs(path+"\\"+file[:-len(file.split("\\")[-1])])
+        mpq.ex(self, file, path+"\\"+file)
+        
+    def cr(self, size):
+        mpq.cr(self, size)
+        
+    def ad(self, file, path):
+        mpq.ad(self, file, path)
         
     def ex_all(self, folder):
-        if not os.path.exists(folder):
-            os.mkdir(folder)
         # Extract map components
         for f in constants.mapParts:
-            self.ex(f, folder+'\\'+f)
+            self.ex(f, folder)
         # Get import list from map
         imp = folder+'\\'+constants.mapImports
         if os.path.exists(imp):
             files = imports(imp).getData()
             # Extract imported files
             for f in files:
-                self.ex(f, folder+'\\'+f)
+                self.ex(f, folder)
+                
+    def ad_all(self, folder):
+        for subdir, dirs, files in os.walk(folder):
+            for f in files:
+                self.ad(folder+"\\"+f, f)
+                
+    def pack(self, folder):
+        size = 0
+        for subdir, dirs, files in os.walk(folder):
+            for f in files:
+                size += 1
+        self.cr(size)
+        self.ad_all(folder)
+        self.cl()
+
 
         
 
