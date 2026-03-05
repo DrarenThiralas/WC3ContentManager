@@ -23,16 +23,16 @@ class customdata:
         
     def parse(self):
         reader = bytesreader(self.b)
-        print("parsing custom "+self.type+" data")
+        #print("parsing custom "+self.type+" data")
         version = reader.readInt()
-        print("format version: "+str(version))
+        #print("format version: "+str(version))
         self.data = []
         
         def parsefield(obj):
             code = reader.readChars(4)
-            print("parsing field "+code)
+            #print("parsing field "+code)
             tp = reader.readInt()
-            print("type: "+str(tp))
+            #print("type: "+str(tp))
             level = 0
             pointer = 0
             if typeHasExtraFields(self.type):
@@ -45,7 +45,7 @@ class customdata:
                 value = reader.readStr()
             else:
                 value = reader.readFloat()
-            print("value is "+str(value))
+            #print("value is "+str(value))
             signature = reader.readInt()
             field = war3ObjectField(code, tp, value, level, pointer)
             obj.syncField(field)
@@ -53,19 +53,19 @@ class customdata:
         def parseobject(isBase):
             proto = reader.readChars(4)
             code = reader.readChars(4)
-            print("edited object: "+proto+":"+code)
+            #print("edited object: "+proto+":"+code)
             size = reader.readInt()
-            print("fields: "+str(size))
+            #print("fields: "+str(size))
             obj = war3Object(self.type, proto) if isBase else war3Object(self.type, proto, code)
             for j in range(size):
                parsefield(obj)
             return obj
         
         size0 = reader.readInt()
-        print("edits to base objects: "+str(size0))
+        #print("edits to base objects: "+str(size0))
         self.data = self.data + [parseobject(True) for i in range(size0)]
         size1 = reader.readInt()
-        print("custom objects: "+str(size1))
+        #print("custom objects: "+str(size1))
         self.data = self.data + [parseobject(False) for i in range(size1)]
             
     def getData(self):
