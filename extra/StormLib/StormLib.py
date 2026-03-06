@@ -40,7 +40,7 @@ class mpq:
         
     def ad(self, file, target):
         print("adding "+file+" as "+target)
-        d0 = ctypes.wintypes.DWORD(0x80000000+0x00000200)
+        d0 = ctypes.wintypes.DWORD(0x80000200)
         d2 = ctypes.wintypes.DWORD(0x02)
         df = ctypes.wintypes.DWORD(0xFFFFFFFF)
         cfile = ctypes.c_wchar_p(file)
@@ -84,7 +84,7 @@ class w3x(mpq):
     def ad_all(self, folder):
         for subdir, dirs, files in os.walk(folder):
             for f in files:
-                self.ad(folder+"\\"+f, f)
+                self.ad(subdir+"\\"+f, subdir[len(folder)+1:]+("\\" if subdir!=folder else "")+f)
                 
     def pack(self, folder):
         size = 0
