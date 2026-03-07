@@ -5,9 +5,9 @@ Created on Mon Jul 28 11:21:07 2025
 @author: alivemary
 """
 
-import yaml
+import yaml, os
 
-war3ObjectTypes = ['dood', 'abil', 'upgd', 'unit', 'item', 'dest','buff']
+war3ObjectTypes = ['dood', 'abil', 'upgd', 'unit', 'item', 'dest', 'buff']
 
 def typeHasExtraFields(tp):
     index = war3ObjectTypes.index(tp)
@@ -26,10 +26,10 @@ def war3ObjectField(rawcode, flag, value, level = 0, pointer = 0):
         d['level'] = level
         d['pointer'] = pointer
         return d
-
+    
 class war3Object:
     
-    def __init__(self, tp, proto, rawcode = ""):
+    def __init__(self, tp = "", proto = "", rawcode = ""):
         self.d = dict()
         self.d['proto'] = proto
         self.d['id'] = rawcode if rawcode != "" else proto
@@ -59,5 +59,15 @@ class war3Object:
         file.close()
         
     def toYml(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(path+'\\'+self.d['id']+'.yml', 'w') as outfile:
             yaml.dump(self.d, outfile, default_flow_style=False)
+            
+    def readYml(self, path):
+        if os.path.exists(path):
+            with open(path, 'r') as file:
+                d = yaml.safe_load(file)
+                self.d = d
+        else:
+            print("error loading object from "+path)
