@@ -20,6 +20,19 @@ test.cl()
 test2 = contentData().read('.\\test2_w3x', False)
 test2.write('.\\test3_lni')
 
+mp = None
+with open('.\\test2.w3x', 'rb') as file:
+    mp = file.read()
+    file.close()
+header = mp[:512]
+with open('.\\test2_new.w3x', 'rb') as file:
+    mp = file.read()
+    file.close()
+header+=mp
+with open('.\\test2_new.w3x', 'wb') as file:
+    file.write(header)
+    file.close()
+
 
 #app = QApplication([])
 #mainWin = mainWindow()

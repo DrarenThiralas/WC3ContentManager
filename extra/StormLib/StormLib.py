@@ -86,7 +86,8 @@ class w3x(mpq):
             for f in files:
                 self.ad(subdir+"\\"+f, subdir[len(folder)+1:]+("\\" if subdir!=folder else "")+f)
                 
-    def pack(self, folder):
+    def pack(self, folder, header):
+        # pack mpq
         size = 0
         for subdir, dirs, files in os.walk(folder):
             for f in files:
@@ -94,6 +95,22 @@ class w3x(mpq):
         self.cr(size)
         self.ad_all(folder)
         self.cl()
+        
+        #TODO: move this to mapData and finish it
+        # add w3x header
+        """
+        mp = None
+        with open(self.path, 'rb') as file:
+            mp = file.read()
+            file.close()
+            
+        header = bytearray()
+        header.append("HM3W".encode("UTF-8"))
+        header.append(int.to_bytes(0, 4, 'little'))
+        header.append()
+        """
+        
+        
 
 
         
