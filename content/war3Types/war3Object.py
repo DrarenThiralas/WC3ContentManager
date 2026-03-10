@@ -29,28 +29,29 @@ def war3ObjectField(rawcode, flag, value, level = 0, pointer = 0):
 class war3Object:
     
     def __init__(self, tp = "", proto = "", rawcode = ""):
-        self.d = dict()
-        self.d['proto'] = proto
-        self.d['id'] = rawcode if rawcode != "" else proto
-        self.d['type'] = tp
-        self.d['fields'] = []
+        self.proto = proto
+        self.id = rawcode if rawcode != "" else proto
+        self.type = tp
+        self.fields = dict()
         
     def __str__(self):
-        return self.d['proto']+":"+self.d['id']
+        return self.proto+":"+self.id
         
     def __contains__(self, field):
-        matches = [field == f for f in self.d['fields']]
-        return (True in matches)
+        if not field['id'] in self.fields:
+            return False
+        return (self.fields[field['id']] == field)
         
     def __eq__(self, o):
-        keys = ['proto', 'id', 'type']
-        conds = [self.d[key] == o.d[key] for key in keys]
+        vals1 = [self.proto, self.id, self.type]
+        vals2 = [o.proto, o.id, o.type]
+        conds = [vals1[i] == vals2[i] for i in range(len(vals1))]
         if False in conds:
             return False
-        fields1 = [field in self.d['fields'] for field in o.d['fields']]
+        fields1 = [field in self for field in o.fields.values()]
         if False in fields1:
             return False
-        fields2 = [field in o.d['fields'] for field in self.d['fields']]
+        fields2 = [field in o for field in self.fields.values()]
         if False in fields2:
             return False
         return True
@@ -59,35 +60,45 @@ class war3Object:
         return not self == o
         
     def isOriginal(self):
-        return self.d['proto'] == self.d['id']
-        
-    def syncField(self, field):
-        fieldNames = [f['id'] for f in self.d['fields']]
-        if field['id'] in fieldNames:
-            index = fieldNames.index(field['id'])
-            self.d['fields'][index] = field
-        else:
-            self.d['fields'].append(field)
-            
-            
-    def getField(self, code):
-        fieldNames = [f['id'] for f in self.d['fields']]
-        index = fieldNames.index(code)
-        return None if index == -1 else self.d['fields'][index]
+        return self.proto == self.id
     
-    def toLni(self, path):
-        file = open(path, 'w')
+    def __len__(self):
+        if self.fields == None:
+            return 0
+        else:
+            return len(self.fields)
+    
+    def __getitem__(self, key):
+        return self.fields[key]
+        
+    def __setitem__(self, key, field):
+        if key != 0:
+            self.fields[key]=field
+        else:
+            self.fields[field['id']]=field
+            
+    def syncFields(self, fields):
+        if type(fields) is dict:
+            for key, field in fields.items():
+                self[key]=field
+        elif type(fields) is list:
+            for field in fields:
+                self[0]=field
+    
+    def toLni(self):
         lines = [self.type, self.proto, self.id]
         lines = lines + [str(field) for field in self.fields]
-        lines = [line + '\n' for line in lines]
-        file.writelines(lines)
-        file.close()
-        
+        return lines
+
     def read(self, path):
         if os.path.exists(path):
             with open(path, 'r') as file:
                 d = yaml.safe_load(file)
-                self.d = d
+                self.proto = d['proto']
+                self.id = d['id']
+                self.type = d['type']
+                self.fields = dict()
+                self.syncFields(d['fields'])
         else:
             print("error loading object from "+path)
         return self
@@ -95,8 +106,13 @@ class war3Object:
     def write(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
-        with open(path+'\\'+self.d['id']+'.yml', 'w') as outfile:
-            yaml.dump(self.d, outfile, default_flow_style=False)
+        with open(path+'\\'+self.id+'.yml', 'w') as outfile:
+            d = dict()
+            d['proto'] = self.proto
+            d['id'] = self.id
+            d['type'] = self.type
+            d['fields'] = list(self.fields.values())
+            yaml.dump(d, outfile, default_flow_style=False)
             
     def getTableOrder(self):
         """
@@ -108,12 +124,12 @@ class war3Object:
 
         """
         
-        base = [self.d['proto'], self.d['id'], len(self.d['fields'])]
+        base = [self.proto, self.id, len(self)]
         fields = None
-        if typeHasExtraFields(self.d['type']):
-            fields = [[f['id'], f['type'], f['level'], f['pointer'], f['value'], self.d['id']] for f in self.d['fields']]
+        if typeHasExtraFields(self.type):
+            fields = [[f['id'], f['type'], f['level'], f['pointer'], f['value'], self.id] for f in self.fields.values()]
         else:
-            fields = [[f['id'], f['type'], f['value'], self.d['id']] for f in self.d['fields']]
+            fields = [[f['id'], f['type'], f['value'], self.id] for f in self.fields.values()]
         return base+fields
 
         

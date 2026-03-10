@@ -53,7 +53,7 @@ class customdata:
             #print("value is "+str(value))
             signature = reader.readInt()
             field = war3ObjectField(code, tp, value, level, pointer)
-            obj.syncField(field)
+            obj[0]=field
             
         def parseobject(isBase):
             proto = reader.readChars(4)

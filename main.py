@@ -33,6 +33,9 @@ test5 = objectDataType('item').read('.\\test2_w3x', False)
 test5.write('.\\test2_yml')
 
 test5a = objectDataType('item').read('.\\test2_yml')
+for obj in test5a.data:
+    print(str(obj))
+    print(str(obj.fields))
 test5a.write('.\\test2_yml', False)
 
 test5b = objectDataType('item').read('.\\test2_yml', False)
