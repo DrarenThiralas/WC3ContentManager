@@ -19,8 +19,11 @@ class constants:
 
     def getBaseObjectData():
         return objectData("Data\\BaseObjectData")
+    
+    def getObjTypeFile(tp):
+        return constants.mapCustomDataParts[constants.objTypes.index(tp)]
 
-    objTypes = ['ability', 'buff', 'item','unit', 'misc', 'upgrade', 'doodad', 'destructable']
+    objTypes = ['dood', 'abil', 'upgd', 'unit', 'item', 'dest', 'buff']
     triggerTypes = ['trigger', 'customscript', 'vars']
     resourceTypes = ['resource']
     defaultTypes = objTypes + triggerTypes + resourceTypes
@@ -33,13 +36,20 @@ class constants:
         'war3map.wts'# Trigger Strings
         ]
     mapCustomDataParts = [
+        'war3map.w3d',# Custom Doodad Data
+        'war3map.w3a',# Custom Ability Data
+        'war3map.w3q',# Custom Upgrade Data
         'war3map.w3u',# Custom Unit Data
         'war3map.w3t',# Custom Item Data
         'war3map.w3b',# Custom Destructible Data
-        'war3map.w3d',# Custom Doodad Data
-        'war3map.w3a',# Custom Ability Data
         'war3map.w3h',# Custom Buff Data
-        'war3map.w3q'# Custom Upgrade Data
+
+        ]
+    mapInfoParts = [
+        'war3map.w3i',# Map Info
+        'war3mapMisc.txt',# Gameplay Constants
+        'war3mapSkin.txt',# Game Interface
+        'war3mapExtra.txt'# Custom Sky Data
         ]
     mapTerrainParts = [
         'war3map.w3e',# Tileset Data
@@ -51,17 +61,13 @@ class constants:
         'war3map.mmp'# Minimap Icon Data
         ]
     mapMiscParts = [
-        'war3map.w3i',# Map Info
         'war3map.w3c',# Camera Data, Editor Only
         'war3map.w3r',# Region Data, Editor Only
         'war3map.w3s',# Sound Data, Editor Only
         'war3map.wai',# AI Data
-        'war3mapMisc.txt',# Gameplay Constants
-        'war3mapSkin.txt',# Game Interface
-        'war3mapExtra.txt'# Custom Sky Data
         ]
     
-    mapParts = [mapImports, mapScript] + mapTriggerParts + mapCustomDataParts + mapTerrainParts + mapMiscParts
+    mapParts = [mapImports, mapScript] + mapTriggerParts + mapCustomDataParts + mapInfoParts + mapTerrainParts + mapMiscParts
 
 class contentContainer:
 

@@ -5,7 +5,7 @@ Created on Sun Jul 27 13:16:43 2025
 @author: alivemary
 """
 
-from extra.war3MapParsers.common import bytesreader
+from extra.war3MapParsers.bytesreader import bytesreader
 
 class imports:
     

@@ -6,11 +6,10 @@ Created on Mon Jul 28 11:21:07 2025
 """
 
 import yaml, os
-
-war3ObjectTypes = ['dood', 'abil', 'upgd', 'unit', 'item', 'dest', 'buff']
+from extra.common import constants
 
 def typeHasExtraFields(tp):
-    index = war3ObjectTypes.index(tp)
+    index = constants.objTypes.index(tp)
     return (index <= 2)
 
 def war3ObjectField(rawcode, flag, value, level = 0, pointer = 0):

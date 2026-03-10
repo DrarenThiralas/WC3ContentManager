@@ -5,21 +5,26 @@ Created on Sun Jul 27 13:17:42 2025
 @author: alivemary
 """
 
-from extra.war3MapParsers.common import bytesreader
+from extra.war3MapParsers.bytesreader import bytesreader
+from extra.war3MapParsers.byteswriter import byteswriter
+from extra.common import constants
 from content.war3Types.war3Object import war3Object, war3ObjectField, typeHasExtraFields
 
 class customdata:
     
-    def __init__(self, path, tp):
-        self.path = path
+    def __init__(self, tp):
         self.type = tp
+        self.b = None
         self.size = 0
         self.data = None
         
-    def read(self):
-        file = open(self.path, 'rb')
-        self.b = file.read()
-        file.close()
+    def read(self, path):
+        self.path = path
+        f = constants.getObjTypeFile(self.type)
+        with open(self.path+'\\'+f, 'rb') as file:
+            self.b = file.read()
+            file.close()
+        return self
         
     def parse(self):
         reader = bytesreader(self.b)
