@@ -88,12 +88,17 @@ class objectDataType:
 
         """
         if isYml:
-            for subdir, dirs, files in os.walk(path+'\\'+self.type):
-                data = [war3Object().read(subdir+'\\'+f) for f in files]
+            f = path+'\\'+self.type
+            if not os.path.exists(f):
+                return None
+            for subdir, dirs, files in os.walk(f):
+                data = [war3Object().read(subdir+'\\'+file) for file in files]
                 keys = [obj.id for obj in data]
                 self.data = dict(zip(keys, data))
         else:
                 data = customdata(self.type).read(path).getData()
+                if type(data) == type(None):
+                    return None
                 keys = [obj.id for obj in data]
                 self.data = dict(zip(keys, data))
         return self
@@ -189,3 +194,55 @@ class objectData:
                     del self[dataType]
                 else:
                     self.subtractDataType(dataType, dataToRemove[dataType])
+                    
+    def read(self, path, isYml = True):
+        """
+        Read the object data from a folder.
+
+        Parameters
+        ----------
+        path : string
+            Path to the object data folder.
+        isYml : bool, optional
+            Whether the data is stored in yml or w3x format. The default is True (yml).
+
+        Returns
+        -------
+        self
+
+        """
+        
+        for dataType in constants.objTypes:
+            
+            f = "\\data" if isYml else ""
+            
+            if os.path.exists(path+f):
+                odt = objectDataType(dataType).read(path+f, isYml)
+                if type(odt) != type(None):
+                    self[dataType] = odt
+        
+        return self
+    
+    def write(self, path, isYml = True):
+        """
+        Write the object data to a folder.
+
+        Parameters
+        ----------
+        path : string
+            Path to the object data folder.
+        isYml : bool, optional
+            Whether the data is stored in yml or w3x format. The default is True (yml).
+
+        Returns
+        -------
+        self
+
+        """
+        
+        for value in self.data.values():
+        
+            f = "\\data" if isYml else ""
+            value.write(path+f, isYml)
+        
+        return self

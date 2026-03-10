@@ -116,6 +116,7 @@ class war3Object:
                 self.syncFields(d['fields'])
         else:
             print("error loading object from "+path)
+            return None
         return self
         
     def write(self, path):

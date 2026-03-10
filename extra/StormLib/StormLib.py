@@ -76,7 +76,7 @@ class w3x(mpq):
         # Get import list from map
         imp = folder+'\\'+constants.mapImports
         if os.path.exists(imp):
-            files = imports(imp).getData()
+            files = imports().read(imp).getData()
             # Extract imported files
             for f in files:
                 self.ex(f, folder)

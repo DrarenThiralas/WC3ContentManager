@@ -5,6 +5,7 @@ Created on Sun Jul 27 13:17:42 2025
 @author: alivemary
 """
 
+import os
 from extra.war3MapParsers.bytesreader import bytesreader
 from extra.war3MapParsers.byteswriter import byteswriter
 from extra.common import constants
@@ -20,13 +21,16 @@ class customdata:
         
     def read(self, path):
         self.path = path
-        f = constants.getObjTypeFile(self.type)
-        with open(self.path+'\\'+f, 'rb') as file:
-            self.b = file.read()
-            file.close()
+        f = self.path + '\\' + constants.getObjTypeFile(self.type)
+        if os.path.exists(f):
+            with open(f, 'rb') as file:
+                self.b = file.read()
+                file.close()
         return self
         
     def parse(self):
+        if self.b == None:
+            return None
         reader = bytesreader(self.b)
         #print("parsing custom "+self.type+" data")
         version = reader.readInt()
@@ -92,6 +96,8 @@ class customdata:
             
         self.path = path
         f = constants.getObjTypeFile(self.type)
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(self.path+'\\'+f, 'wb') as file:
             writer = byteswriter(file)
             
