@@ -72,9 +72,82 @@ class customdata:
         size1 = reader.readInt()
         #print("custom objects: "+str(size1))
         self.data = self.data + [parseobject(False) for i in range(size1)]
+        
+        return self
             
     def getData(self):
         if self.data == None:
-            self.read()
             self.parse()
         return self.data
+    
+    def setData(self, data):
+        self.data = data
+        return self
+
+    def write(self, path, data = None):
+        
+        if data != None:
+            self.setData(data)
+            
+        self.path = path
+        f = constants.getObjTypeFile(self.type)
+        with open(self.path+'\\'+f, 'wb') as file:
+            writer = byteswriter(file)
+            
+            #Write version
+            writer.writeInt(2)
+            
+            def writetable(objs, isOrig = False):
+                #Table size
+                writer.writeInt(len(objs))
+                for obj in objs:
+                    objEntries = obj.getTableOrder()
+                    #Write object ID
+                    writer.writeChars(objEntries[0])
+                    if isOrig:
+                        writer.writeInt(0)
+                    else:
+                        writer.writeChars(objEntries[1])
+                    #Write field count
+                    writer.writeInt(objEntries[2])
+                    #Write fields
+                    for f in objEntries[3:]:
+                        #Field ID
+                        writer.writeChars(f[0])
+                        #Field type
+                        writer.writeInt(f[1])                    
+                        #Level and pointer
+                        i = 2
+                        if len(f) > 4:
+                            writer.writeInt(f[2])
+                            writer.writeInt(f[3])
+                            i = 4
+                        #Field value
+                        if f[1] == 0:
+                            writer.writeInt(f[i])
+                        elif f[1] == 3:
+                            writer.writeString(f[i])
+                        else:
+                            writer.writeFloat(f[i])
+                        #Field end
+                        writer.writeChars(f[i+1])
+                        
+            #Write original object table
+            orig = [obj for obj in self.data if obj.isOriginal()]
+            writetable(orig, True)
+            #Write custom object table
+            custom = [obj for obj in self.data if not obj.isOriginal()]
+            writetable(custom)
+            
+            file.close()
+        
+        return self
+    
+    
+    
+    
+    
+    
+    
+    
+    
