@@ -29,16 +29,16 @@ for obj in test3.getData():
 #test4 = w3x(".\\test2_new.w3x")
 #test4.pack(".\\test2_w3x")
 
-test5 = objectDataType('item').read('.\\test2_w3x', False)
+test5 = objectDataType('abil').read('.\\test2_w3x', False)
 test5.write('.\\test2_yml')
 
-test5a = objectDataType('item').read('.\\test2_yml')
+test5a = objectDataType('abil').read('.\\test2_yml')
 for obj in test5a.data.values():
     print(str(obj))
     print(str(obj.fields))
 test5a.write('.\\test2_yml', False)
 
-test5b = objectDataType('item').read('.\\test2_yml', False)
+test5b = objectDataType('abil').read('.\\test2_yml', False)
 
 print("Comparing object data before and after:")
 print("Objects before: "+str(len(test5.data)))

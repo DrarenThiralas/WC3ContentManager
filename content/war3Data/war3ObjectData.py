@@ -36,8 +36,40 @@ class objectDataType:
         matches = [obj == o for obj in self.data.values()]
         return (True in matches)
     
+    def __eq__(self, o):
+        matches = [obj in self for obj in o.data.value()]
+        if (False in matches):
+            return False
+        matches = [obj in o for obj in self.data.values()]
+        if (False in matches):
+            return False
+        return True
+        
+    def __ne__(self, o):
+        return not self == o
+    
     def __getitem__(self, key):
-        return self.data.index
+        return self.data[key]
+    
+    def __setitem__(self, key, item):
+        if key != 0:
+            self.data[key]=item
+        else:
+            self.data[item['id']]=item
+            
+    def __iadd__(self, odt):
+        for key, value in odt.data:
+            if key in self.data:
+                self.data[key]+=value
+            else:
+                self.data[key]=value
+                
+    def __isub__(self, odt):
+        for key, value in odt.data:
+            if value in self:
+                del self.data[key]
+            elif key in self.data:
+                self.data[key]-=value
         
     def read(self, path, isYml = True):
         """
@@ -96,7 +128,8 @@ class objectData:
     def __init__(self):
         """
         Initializes a new objectData object.
-        This object represents object editor data.
+        This object represents object editor data,
+        and consists of a collection of objectDataTypes.
 
         Parameters
         ----------
@@ -110,71 +143,49 @@ class objectData:
         
         self.data = dict()
         
-    def __contains__(self, odt):
-        return odt.type in self.data
+    def __contains__(self, o):
+        if type(o) == objectDataType:    
+            return o.type in self.data
+        elif type(o) == str:
+            return o in self.data
 
+
+
+    def __getitem__(self, dataType):
+        if dataType in self:
+           return self.data[dataType]
+       
+    def __setitem__(self, dataType, odt):
+        self.data[dataType] = odt
+       
     def clearType(self, dataType):
-        if self.getHasType(dataType):
-            os.remove(self.getTypeFile(dataType))
+        if dataType in self:
+            del self.data[dataType]
 
     def clear(self):
-        for Type in self.getTypeList():
-            self.clearType(Type)
+        self.data = dict()
 
-    def getHasType(self, dataType):
-        return dataType in self.data
+    def getTypes(self):
+        return self.data.keys()
 
-    def getTypeList(self):
-        return [Type for Type in constants.objTypes if self.getHasType(Type)]
+    def mergeDataType(self, dataType, newData):
+        if dataType in self:
+            self[dataType] += newData
+        else:
+            self[dataType] = newData
 
-    def getConfig(self, dataType):
+    def __iadd__(self, newData):
+        for dataType in newData.getTypes():
+            self.mergeDataType(dataType, newData[dataType])
 
-        sourcePath = self.path+"\\"+dataType+".ini"
-        sourceConfig = None
-        if os.path.exists(sourcePath):
+    def subtractDataType(self, dataType, dataToRemove):
+        if dataType in self:
+            self[dataType] -= dataToRemove
 
-            print('getting config for '+sourcePath)
-            sourceConfig = expandedConfig()
-
-            sourceConfig.read(sourcePath)
-
-        return sourceConfig
-
-    def setConfig(self, dataType, targetConfig):
-
-        targetPath = self.path+"\\"+dataType+".ini"
-        with open(targetPath, 'w') as configfile:
-            targetConfig.write(configfile)
-            configfile.close()
-
-    def mergeDataType(self, newData, dataType):
-
-        config = newData.getConfig(dataType).merge(self.getConfig(dataType), isCopy = False)
-        self.setConfig(dataType, config)
-
-    def mergeData(self, newData):
-        for dataType in newData.getTypeList():
-            self.mergeDataType(newData, dataType)
-
-    def subtractDataType(self, dataToRemove, dataType):
-
-        config = [self.getConfig(dataType), dataToRemove.getConfig(dataType)]
-
-        for section in config[1].sections():
-            for option in config[1].options(section):
-                if config[0].has_option(option):
-                    config[0].remove_option(section, option)
-                    if len(config[0].options(section)) == 0:
-                        config[0].remove_section(section)
-
-        self.setConfig(dataType, config[0])
-
-    def subtractData(self, dataToRemove):
-
-        for dataType in self.getTypeList():
-            if dataType in dataToRemove.getTypeList():
-                self.subtractDataType(dataToRemove, dataType)
-
-    def setData(self, data):
-        self.clear()
-        self.mergeData(data)
+    def __isub__(self, dataToRemove):
+        for dataType in self.getTypes():
+            if dataType in dataToRemove.getTypes():
+                if dataToRemove[dataType] == self[dataType]:
+                    del self[dataType]
+                else:
+                    self.subtractDataType(dataType, dataToRemove[dataType])

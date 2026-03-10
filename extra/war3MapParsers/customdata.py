@@ -40,7 +40,8 @@ class customdata:
             #print("type: "+str(tp))
             level = 0
             pointer = 0
-            if typeHasExtraFields(self.type):
+            extra = typeHasExtraFields(self.type)
+            if extra:
                 level = reader.readInt()
                 pointer = reader.readInt()
             value = 0
@@ -52,7 +53,7 @@ class customdata:
                 value = reader.readFloat()
             #print("value is "+str(value))
             signature = reader.readInt()
-            field = war3ObjectField(code, tp, value, level, pointer)
+            field = war3ObjectField(code, tp, value, extra, level, pointer)
             obj[0]=field
             
         def parseobject(isBase):

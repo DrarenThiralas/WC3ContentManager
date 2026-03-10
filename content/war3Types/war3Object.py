@@ -12,7 +12,7 @@ def typeHasExtraFields(tp):
     index = constants.objTypes.index(tp)
     return (index <= 2)
 
-def war3ObjectField(rawcode, flag, value, level = 0, pointer = 0):
+def war3ObjectField(rawcode, flag, value, extra = False, level = 0, pointer = 0):
         d = dict()
         d['id'] = rawcode
         d['type'] = flag
@@ -22,9 +22,16 @@ def war3ObjectField(rawcode, flag, value, level = 0, pointer = 0):
         # 2 = float (between 0 and 1)
         # 3 = string
         d['value'] = value
-        d['level'] = level
-        d['pointer'] = pointer
+        if extra:
+            d['level'] = level
+            d['pointer'] = pointer
         return d
+    
+def fid(field):
+    if 'level' in field:
+        return field['id']+"_"+str(field['level'])+"_"+str(field['pointer'])
+    else:
+        return field['id']
     
 class war3Object:
     
@@ -38,9 +45,9 @@ class war3Object:
         return self.proto+":"+self.id
         
     def __contains__(self, field):
-        if not field['id'] in self.fields:
+        if not fid(field) in self.fields:
             return False
-        return (self.fields[field['id']] == field)
+        return (self.fields[fid(field)] == field)
         
     def __eq__(self, o):
         vals1 = [self.proto, self.id, self.type]
@@ -75,7 +82,15 @@ class war3Object:
         if key != 0:
             self.fields[key]=field
         else:
-            self.fields[field['id']]=field
+            self.fields[fid(field)]=field
+            
+    def __iadd__(self, obj):
+        self.syncFields(obj.fields)
+        
+    def __isub__(self, obj):
+        for key, field in obj.fields.items():
+            if field in self:
+                del self.fields[key]
             
     def syncFields(self, fields):
         if type(fields) is dict:
