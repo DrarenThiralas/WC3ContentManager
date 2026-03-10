@@ -35,6 +35,32 @@ class war3Object:
         self.d['type'] = tp
         self.d['fields'] = []
         
+    def __str__(self):
+        return self.d['proto']+":"+self.d['id']
+        
+    def __contains__(self, field):
+        matches = [field == f for f in self.d['fields']]
+        return (True in matches)
+        
+    def __eq__(self, o):
+        keys = ['proto', 'id', 'type']
+        conds = [self.d[key] == o.d[key] for key in keys]
+        if False in conds:
+            return False
+        fields1 = [field in self.d['fields'] for field in o.d['fields']]
+        if False in fields1:
+            return False
+        fields2 = [field in o.d['fields'] for field in self.d['fields']]
+        if False in fields2:
+            return False
+        return True
+        
+    def __ne__(self, o):
+        return not self == o
+        
+    def isOriginal(self):
+        return self.d['proto'] == self.d['id']
+        
     def syncField(self, field):
         fieldNames = [f['id'] for f in self.d['fields']]
         if field['id'] in fieldNames:
@@ -57,16 +83,40 @@ class war3Object:
         file.writelines(lines)
         file.close()
         
-    def toYml(self, path):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(path+'\\'+self.d['id']+'.yml', 'w') as outfile:
-            yaml.dump(self.d, outfile, default_flow_style=False)
-            
-    def readYml(self, path):
+    def read(self, path):
         if os.path.exists(path):
             with open(path, 'r') as file:
                 d = yaml.safe_load(file)
                 self.d = d
         else:
             print("error loading object from "+path)
+        return self
+        
+    def write(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(path+'\\'+self.d['id']+'.yml', 'w') as outfile:
+            yaml.dump(self.d, outfile, default_flow_style=False)
+            
+    def getTableOrder(self):
+        """
+        Returns a list of object parts in the right order for writing to a table.
+        
+        Returns
+        -------
+        None.
+
+        """
+        
+        base = [self.d['proto'], self.d['id'], len(self.d['fields'])]
+        fields = None
+        if typeHasExtraFields(self.d['type']):
+            fields = [[f['id'], f['type'], f['level'], f['pointer'], f['value'], self.d['id']] for f in self.d['fields']]
+        else:
+            fields = [[f['id'], f['type'], f['value'], self.d['id']] for f in self.d['fields']]
+        return base+fields
+
+        
+        
+            
+

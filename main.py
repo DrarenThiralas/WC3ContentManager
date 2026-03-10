@@ -11,28 +11,41 @@ import sys, os
 from extra.StormLib.StormLib import w3x
 from extra.war3MapParsers.strings import strings
 from extra.war3MapParsers.customdata import customdata
-from content.war3Types.war3Object import ymlToObject
+from content.war3Data.war3ObjectData import objectDataType
 
 test = w3x(".\\test2.w3x")
 test.op()
 test.ex_all('.\\test2_w3x')
 test.cl()
 
-test2 = strings('.\\test2_w3x\\war3map.wts')
+test2 = strings().read('.\\test2_w3x\\war3map.wts')
 print(test2.getData())
 
-test3 = customdata('.\\test2_w3x\\war3map.w3u', 'unit')
+test3 = customdata('unit').read('.\\test2_w3x')
 
 for obj in test3.getData():
-    obj.toYml('.\\test2_yml\\unit')
+    obj.write('.\\test2_yml\\unit')
     
 #test4 = w3x(".\\test2_new.w3x")
 #test4.pack(".\\test2_w3x")
 
-test5 = customdata('.\\test2_w3x\\war3map.w3t', 'item')
+test5 = objectDataType('item').read('.\\test2_w3x', False)
+test5.write('.\\test2_yml')
 
-for obj in test5.getData():
-    obj.toYml('.\\test2_yml\\item')
+test5a = objectDataType('item').read('.\\test2_yml')
+test5a.write('.\\test2_yml', False)
+
+test5b = objectDataType('item').read('.\\test2_yml', False)
+
+print("Comparing object data before and after:")
+print("Objects before: "+str(len(test5.data)))
+print("List: "+str([str(obj) for obj in test5.data]))
+print("Objects after: "+str(len(test5b.data)))
+print("List: "+str([str(obj) for obj in test5b.data]))
+mask = [int(obj in test5b) for obj in test5.data]
+print("Preserved objects: "+str(sum(mask))+" out of "+str(len(test5.data)))
+print("Object preservation mask:")
+print(str(mask))
 
 #app = QApplication([])
 #mainWin = mainWindow()
