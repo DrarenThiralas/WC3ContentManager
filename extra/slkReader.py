@@ -5,7 +5,7 @@ Created on Sat Dec  7 16:36:38 2024
 @author: Common
 """
 
-from extra.expandedConfig import expandedConfig
+from extra.iniReader import iniReader
 
 class slkConstants:
 
@@ -48,7 +48,9 @@ class slkReader:
 
     def toConfig(self, sectionColumn = 0):
 
-        config = expandedConfig()
+        #TODO: Replace with toYml        
+
+        config = iniReader()
 
         matrix = self.getMatrix()
         columns = len(matrix[0])

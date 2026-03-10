@@ -6,13 +6,12 @@ Created on Wed Apr 17 04:50:04 2024
 """
 
 import os, shutil
-from extra.expandedConfig import expandedConfig
-from extra.lmlParser import lmlParser, lmlLine, lmlEntry
+from extra.iniReader import iniReader
 
 class constants:
 
     def getGlobalOption(option):
-        config = expandedConfig()
+        config = iniReader()
         config.read("config.ini")
         value = config["Settings"][option]
         return value
@@ -377,7 +376,6 @@ class objectData:
     def setData(self, data):
         self.clear()
         self.mergeData(data)
-
 
 
 class resourceData:

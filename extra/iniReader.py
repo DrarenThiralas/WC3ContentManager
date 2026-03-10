@@ -7,13 +7,13 @@ Created on Sun Dec  8 15:17:06 2024
 
 import configparser
 
-class expandedConfig(configparser.ConfigParser):
+class iniReader(configparser.ConfigParser):
 
     def __init__(self, comment_prefixes=('--', '//')):
         configparser.ConfigParser.__init__(self, comment_prefixes=comment_prefixes, strict = False, interpolation = None)
 
     def copy(self):
-        cfgNew = expandedConfig()
+        cfgNew = iniReader()
         for section in self:
             if not section == 'DEFAULT':
                 if not cfgNew.has_section(section):
@@ -78,6 +78,6 @@ class expandedConfig(configparser.ConfigParser):
         try:
             configparser.ConfigParser.read(self, file)
         except:
-            print(file)
+            #print(file)
             self.addIdentations(file)
             configparser.ConfigParser.read(self, file)
