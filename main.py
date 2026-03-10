@@ -33,7 +33,7 @@ test5 = objectDataType('item').read('.\\test2_w3x', False)
 test5.write('.\\test2_yml')
 
 test5a = objectDataType('item').read('.\\test2_yml')
-for obj in test5a.data:
+for obj in test5a.data.values():
     print(str(obj))
     print(str(obj.fields))
 test5a.write('.\\test2_yml', False)
@@ -42,10 +42,10 @@ test5b = objectDataType('item').read('.\\test2_yml', False)
 
 print("Comparing object data before and after:")
 print("Objects before: "+str(len(test5.data)))
-print("List: "+str([str(obj) for obj in test5.data]))
-print("Objects after: "+str(len(test5b.data)))
-print("List: "+str([str(obj) for obj in test5b.data]))
-mask = [int(obj in test5b) for obj in test5.data]
+print("List: "+str([str(obj) for obj in test5.data.values()]))
+print("Objects after: "+str(len(test5b.data.values())))
+print("List: "+str([str(obj) for obj in test5b.data.values()]))
+mask = [int(obj in test5b) for obj in test5.data.values()]
 print("Preserved objects: "+str(sum(mask))+" out of "+str(len(test5.data)))
 print("Object preservation mask:")
 print(str(mask))

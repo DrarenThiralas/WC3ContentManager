@@ -30,11 +30,14 @@ class objectDataType:
 
         """
         self.type = tp
-        self.data = None
+        self.data = dict()
         
     def __contains__(self, o):
-        matches = [obj == o for obj in self.data]
+        matches = [obj == o for obj in self.data.values()]
         return (True in matches)
+    
+    def __getitem__(self, key):
+        return self.data.index
         
     def read(self, path, isYml = True):
         """
@@ -54,9 +57,13 @@ class objectDataType:
         """
         if isYml:
             for subdir, dirs, files in os.walk(path+'\\'+self.type):
-                self.data = [war3Object().read(subdir+'\\'+f) for f in files]
+                data = [war3Object().read(subdir+'\\'+f) for f in files]
+                keys = [obj.id for obj in data]
+                self.data = dict(zip(keys, data))
         else:
-            self.data = customdata(self.type).read(path).getData()            
+                data = customdata(self.type).read(path).getData()
+                keys = [obj.id for obj in data]
+                self.data = dict(zip(keys, data))
         return self
     
     def write(self, path, isYml = True):
@@ -77,7 +84,7 @@ class objectDataType:
         """
         
         if isYml:
-            for obj in self.data:
+            for obj in self.data.values():
                 obj.write(path+'\\'+self.type)
         else:
             customdata(self.type).write(path, self.data)
@@ -86,24 +93,25 @@ class objectDataType:
 
 class objectData:
 
-    def __init__(self, path):
+    def __init__(self):
         """
         Initializes a new objectData object.
         This object represents object editor data.
 
         Parameters
         ----------
-        path : string
-            Path to the object data folder.
+        None.
 
         Returns
         -------
         None.
 
         """
-        self.path = path
-        if not os.path.exists(path):
-            os.makedirs(path)
+        
+        self.data = dict()
+        
+    def __contains__(self, odt):
+        return odt.type in self.data
 
     def clearType(self, dataType):
         if self.getHasType(dataType):
@@ -113,11 +121,8 @@ class objectData:
         for Type in self.getTypeList():
             self.clearType(Type)
 
-    def getTypeFile(self, dataType):
-        return self.path+"\\"+dataType+".ini"
-
     def getHasType(self, dataType):
-        return os.path.exists(self.getTypeFile(dataType))
+        return dataType in self.data
 
     def getTypeList(self):
         return [Type for Type in constants.objTypes if self.getHasType(Type)]

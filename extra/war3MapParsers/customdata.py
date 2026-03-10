@@ -133,10 +133,10 @@ class customdata:
                         writer.writeChars(f[i+1])
                         
             #Write original object table
-            orig = [obj for obj in self.data if obj.isOriginal()]
+            orig = [obj for obj in self.data.values() if obj.isOriginal()]
             writetable(orig, True)
             #Write custom object table
-            custom = [obj for obj in self.data if not obj.isOriginal()]
+            custom = [obj for obj in self.data.values() if not obj.isOriginal()]
             writetable(custom)
             
             file.close()
