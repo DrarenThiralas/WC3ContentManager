@@ -36,13 +36,13 @@ class byteswriter:
         self.b.write(ans)
         
     def writeChars(self, w):
-        #Only ASCII is supported due to WC3 limitations
-        ans = w.encode('ASCII')
+        #Only UTF-8 is supported due to WC3 limitations
+        ans = w.encode('UTF-8')
         self.i += len(ans)
         self.b.write(ans)
         
     def writeString(self, w):
         #Same as writeChars, but adds null terminator
-        ans = w.encode('ASCII')+b'\x00'
+        ans = w.encode('UTF-8')+b'\x00'
         self.i += len(ans)
         self.b.write(ans)
