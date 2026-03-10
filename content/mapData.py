@@ -7,10 +7,11 @@ Created on Sat Apr 13 03:09:20 2024
 
 import subprocess, shutil, os
 from extra.sharedObjects import triggerData, objectData, resourceData, contentContainer, constants
+from extra.StormLib import StormLib
 
 class war3Map:
 
-    def __init__(self, mapPath, lniPath = None):
+    def __init__(self, mapPath, upPath = None, ymlPath = None):
         """
         Initializes a new war3Map object.
 
@@ -18,8 +19,10 @@ class war3Map:
         ----------
         mapPath : string
             Path to the map's .w3x file.
-        lniPath: string, default = None
-            Path to the map's lni folder, if the map is unpacked already.
+        upPath: string, default = None
+            Path to the map's unpacked _w3x folder, if the map is unpacked already.
+        ymlPath: string, default = None
+            Path to the map's yml folder, if the map is processed already.
 
         Returns
         -------
@@ -28,7 +31,8 @@ class war3Map:
         """
         self.w3xpath = mapPath
         self.name = mapPath.split('/')[-1][:-4]
-        self.lnipath = lniPath
+        self.uppathath = upPath
+        self.ymlpath = ymlPath
         self.data = self.initData()
 
     def __str__(self):
@@ -52,13 +56,14 @@ class war3Map:
 
         if self.lnipath != None:
             self.data = contentContainer(self.lnipath)
+            #TODO: replace these with new yml data classes
             self.data.triggerData = triggerData(self.lnipath+'\\trigger')
             self.data.objData = objectData(self.lnipath)
             self.data.resourceData = resourceData(self.lnipath)
 
     def unpack(self, debug = False):
         """
-        Unpacks the map into a lni object, stored in the Work subfolder.
+        Unpacks the map into a folder, stored in the Work subfolder.
 
         Returns
         -------
@@ -72,13 +77,29 @@ class war3Map:
             print(message)
 
         self.backup()
-        self.lnipath = "Work\\Maps\\"+self.name+"_w3x"
-        #cwd = os.getcwd()
-        #subprocess.run(["cmd", "/c", 'w2l.exe', "lni", self.w3xpath, cwd+"\\"+self.lnipath], cwd = constants.getGlobalOption('w3x2lni'))
-
-        self.initData()
+        self.uppath = "Work\\Maps\\"+self.name+"_w3x"
+        
+        w3x = StormLib.w3x(self.w3xpath)
+        w3x.ex_all(self.uppath)
 
         return self
+    
+    def decode(self, debug = False):
+        """
+        Decodes the map into a yml content pack, stored in the Work subfolder.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        if self.uppath == None:
+            print("Cannot decode packed map: "+str(self))
+        else:
+            #TODO: decode map
+        
+            self.initData()
 
     def pack(self, debug = False, cleanVars = True):
         """
