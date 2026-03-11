@@ -6,15 +6,14 @@ Created on Tue Mar 10 21:45:02 2026
 @author: drarenthiralas
 """
 
-import os, shutil
+import os
 from extra.common import constants
 from extra.war3MapParsers.imports import imports
 
 class importData:
     
     def __init__(self):
-        self.path = None
-        self.data = None
+        self.data = dict()
         
     def setData(self, data):
         self.data = data
@@ -23,41 +22,52 @@ class importData:
     def getData(self):
         return self.data
     
-    def getPath(self):
-        return self.path
-    
-    def setPath(self, path):
-        self.path = path
-        return self
-    
     def read(self, path, isYml = True):
         if isYml:
-            self.path = path+"\\import"
-            f = self.path+"\\imports.txt"
-            with open(f, 'r') as file:
-                self.setData(file.readlines())
-                file.close()
+            
+            f = path+"\\import"
+            if not os.path.exists(f):
+                return None
+            for subdir, dirs, files in os.walk(f):
+                for fl in files:
+                    with open(subdir+'\\'+fl, 'rb') as file:
+                        cleanpath = (subdir+'\\'+fl)[len(f)+1:]
+                        self.data[cleanpath] = file.read()
+                        print('Reading import file: '+subdir+'\\'+fl)
+                        file.close()
+                    
         else:
+            
             f = path+'\\'+constants.mapImports
-            self.path = path
-            self.setData(imports().read(f).getData())
+            if not os.path.exists(f):
+                return None
+            filelist = imports().read(f).getData()
+            for fl in filelist:
+                if os.path.exists(path+'\\'+fl):
+                    with open(path+'\\'+fl, 'rb') as file:
+                        self.data[fl] = file.read()
+                        print('Reading import file: '+path+'\\'+fl)
+                        file.close()
+                else:
+                    print("Cannot find import: "+fl)
+            
         return self
     
     def write(self, path, isYml = True):
+        
         f = path
+        
         if isYml:
             f = f+"\\import"
-            if not os.path.exists(f):
-                os.makedirs(f)
-            with open(f+'\\imports.txt', 'w') as file:
-                file.writelines([line+"\n" for line in self.data])
-                file.close()
         else:
-            imports().write(f, self.data)
+            imports().write(f, list(self.data.keys()))
             
-        if type(self.path) != type(None):
-            #TODO: copy the actual import files with shutil
-            return 0
+        for fl, b in self.data.items():
+            if not os.path.exists(os.path.dirname(f+'\\'+fl)):
+                os.makedirs(os.path.dirname(f+'\\'+fl))
+            with open(f+'\\'+fl, 'wb') as file:
+                file.write(b)
+                file.close()
             
         return self
     
