@@ -20,6 +20,10 @@ test.cl()
 test2 = contentData().read('.\\test2_w3x', False)
 test2.write('.\\test3_lni')
 
+test3 = contentData().read('.\\test3_lni', True)
+test3.write('.\\test3_w3x', False)
+
+"""
 mp = None
 with open('.\\test2.w3x', 'rb') as file:
     mp = file.read()
@@ -32,6 +36,7 @@ header+=mp
 with open('.\\test2_new.w3x', 'wb') as file:
     file.write(header)
     file.close()
+"""
 
 
 #app = QApplication([])

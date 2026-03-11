@@ -220,6 +220,8 @@ class objectData:
                 odt = objectDataType(dataType).read(path+f, isYml)
                 if type(odt) != type(None):
                     self[dataType] = odt
+            else:
+                return None
         
         return self
     

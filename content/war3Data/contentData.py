@@ -7,6 +7,8 @@ Created on Sat Apr 13 03:09:20 2024
 
 from content.war3Data.objectData import objectData
 from content.war3Data.importData import importData
+from content.war3Data.mapData import mapData
+from content.war3Data.infoData import infoData
 
 class contentData:
 
@@ -26,15 +28,18 @@ class contentData:
         """
         self.objData = None
         self.importData = None
+        self.mapData = None
     
     def read(self, path, isYml = True):
         self.objData = objectData().read(path, isYml)
         self.importData = importData().read(path, isYml)
+        self.mapData = mapData().read(path, isYml)
+        self.infoData = infoData().read(path, isYml)
     
         return self
         
     def write(self, path, isYml = True):
-        writeParts = [self.objData, self.importData]
+        writeParts = [self.objData, self.importData, self.mapData, self.infoData]
         for part in writeParts:
             if type(part) != type(None):
                 part.write(path, isYml)
