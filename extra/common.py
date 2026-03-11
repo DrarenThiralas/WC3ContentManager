@@ -27,12 +27,12 @@ class constants:
     resourceTypes = ['resource']
     defaultTypes = objTypes + triggerTypes + resourceTypes
     
-    mapImports = 'war3map.imp' # Import List, Editor Only
     mapScript = 'war3map.j' # Map Script
+    mapStrings = 'war3map.wts'# Trigger Strings
+    mapImports = 'war3map.imp' # Import List, Editor Only
     mapTriggerParts = [
         'war3map.wtg',# Trigger Data (GUI)
         'war3map.wct',# Trigger Data (JASS)
-        'war3map.wts'# Trigger Strings
         ]
     mapCustomDataParts = [
         'war3map.w3d',# Custom Doodad Data
