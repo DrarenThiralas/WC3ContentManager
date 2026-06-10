@@ -17,6 +17,18 @@ class strings:
             self.file = file.read()
             file.close()
         return self
+    
+    def write(self, path, data=None):
+        if data != None:
+            self.data = data
+        with open(path, 'w') as file:
+            
+            for i in len(self.data):
+                file.write("STRING "+str(i+1)+"\n{\n"+self.data[i]+"\n}\n\n")
+            
+            file.close()
+            
+        return self
         
     def parse(self):
         self.data = [s[:s.find('}')] for s in self.file.split('{')]

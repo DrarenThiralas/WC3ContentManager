@@ -21,6 +21,14 @@ class constants:
     
     def getObjTypeFile(tp):
         return constants.mapCustomDataParts[constants.objTypes.index(tp)]
+    
+    def embedString(string, triggerStrings):
+        i = string.find("TRIGSTR_")
+        if i != -1:
+            index = int(string[i:])
+            return triggerStrings[index-1]
+        else:
+            return string
 
     objTypes = ['dood', 'abil', 'upgd', 'unit', 'item', 'dest', 'buff']
     triggerTypes = ['trigger', 'customscript', 'vars']
@@ -66,7 +74,7 @@ class constants:
         'war3map.wai',# AI Data
         ]
     
-    mapParts = [mapImports, mapScript] + mapTriggerParts + mapCustomDataParts + mapInfoParts + mapTerrainParts + mapMiscParts
+    mapParts = [mapImports, mapScript, mapStrings] + mapTriggerParts + mapCustomDataParts + mapInfoParts + mapTerrainParts + mapMiscParts
 
 class contentContainer:
 

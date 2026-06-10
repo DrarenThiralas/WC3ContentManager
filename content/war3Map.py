@@ -5,7 +5,7 @@ Created on Sat Apr 13 03:09:20 2024
 @author: maxer
 """
 
-import subprocess, shutil, os
+import shutil, os
 from content.war3Data import contentData
 from extra.StormLib import StormLib
 

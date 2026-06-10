@@ -70,6 +70,10 @@ class objectDataType:
                 del self.data[key]
             elif key in self.data:
                 self.data[key]-=value
+                
+    def embedStrings(self, triggerStrings):
+        for obj in self.data.values():
+            obj.embedStrings(triggerStrings)
         
     def read(self, path, isYml = True):
         """
@@ -195,7 +199,11 @@ class objectData:
                 else:
                     self.subtractDataType(dataType, dataToRemove[dataType])
                     
-    def read(self, path, isYml = True):
+    def embedStrings(self, triggerStrings):
+        for odt in self.data.values():
+            odt.embedStrings(triggerStrings)
+                    
+    def read(self, path, isYml = True, triggerStrings = None):
         """
         Read the object data from a folder.
 
@@ -205,6 +213,8 @@ class objectData:
             Path to the object data folder.
         isYml : bool, optional
             Whether the data is stored in yml or w3x format. The default is True (yml).
+        triggerStrings : list of strings, optional
+            If the data is not stored in yml, these are the trigger strings to be embedded in the data.
 
         Returns
         -------
@@ -222,6 +232,9 @@ class objectData:
                     self[dataType] = odt
             else:
                 return None
+            
+        if triggerStrings != None:
+            self.embedStrings(triggerStrings)
         
         return self
     

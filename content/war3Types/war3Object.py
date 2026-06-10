@@ -99,11 +99,11 @@ class war3Object:
         elif type(fields) is list:
             for field in fields:
                 self[0]=field
-    
-    def toLni(self):
-        lines = [self.type, self.proto, self.id]
-        lines = lines + [str(field) for field in self.fields]
-        return lines
+                
+    def embedStrings(self, triggerStrings):
+        for field in self.fields.values():
+            if field['type'] == 3:
+                field['value'] = constants.embedString(field['value'], triggerStrings)
 
     def read(self, path):
         if os.path.exists(path):

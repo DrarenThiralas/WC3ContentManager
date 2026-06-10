@@ -5,6 +5,7 @@ Created on Sat Apr 13 03:09:20 2024
 @author: maxer
 """
 
+from content.war3Data.stringData import stringData
 from content.war3Data.objectData import objectData
 from content.war3Data.importData import importData
 from content.war3Data.mapData import mapData
@@ -26,6 +27,7 @@ class contentData:
         None.
 
         """
+        self.stringData = None
         self.objData = None
         self.importData = None
         self.mapData = None
@@ -35,6 +37,8 @@ class contentData:
         return self.infoData.getHeader()
     
     def read(self, path, isYml = True):
+                
+        self.stringData = stringData().read(path, isYml)
         self.objData = objectData().read(path, isYml)
         self.importData = importData().read(path, isYml)
         self.mapData = mapData().read(path, isYml)
@@ -43,7 +47,8 @@ class contentData:
         return self
         
     def write(self, path, isYml = True):
-        writeParts = [self.objData, self.importData, self.mapData, self.infoData]
+        
+        writeParts = [self.stringData, self.objData, self.importData, self.mapData, self.infoData]
         for part in writeParts:
             if type(part) != type(None):
                 part.write(path, isYml)
