@@ -29,6 +29,10 @@ class contentData:
         self.objData = None
         self.importData = None
         self.mapData = None
+        self.infoData = None
+        
+    def getHeader(self):
+        return self.infoData.getHeader()
     
     def read(self, path, isYml = True):
         self.objData = objectData().read(path, isYml)

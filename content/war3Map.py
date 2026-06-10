@@ -6,7 +6,7 @@ Created on Sat Apr 13 03:09:20 2024
 """
 
 import subprocess, shutil, os
-from extra.sharedObjects import triggerData, objectData, resourceData, contentContainer, constants
+from content.war3Data import contentData
 from extra.StormLib import StormLib
 
 class war3Map:
@@ -31,7 +31,7 @@ class war3Map:
         """
         self.w3xpath = mapPath
         self.name = mapPath.split('/')[-1][:-4]
-        self.uppathath = upPath
+        self.uppath = upPath
         self.ymlpath = ymlPath
         self.data = self.initData()
 
@@ -52,14 +52,16 @@ class war3Map:
         shutil.copy(self.w3xpath, "Backup\\"+self.name+".w3x")
         return self
 
-    def initData(self):
+    def readData(self, isYml = True):
 
-        if self.lnipath != None:
-            self.data = contentContainer(self.lnipath)
-            #TODO: replace these with new yml data classes
-            self.data.triggerData = triggerData(self.lnipath+'\\trigger')
-            self.data.objData = objectData(self.lnipath)
-            self.data.resourceData = resourceData(self.lnipath)
+        if isYml and self.ymlpath != None:
+            self.data = contentData().read(self.ymlpath)
+        elif self.uppath != None:
+            self.data = contentData().read(self.uppath, False)
+            
+    def getHeader(self):
+        
+        return self.data.getHeader()
 
     def unpack(self, debug = False):
         """
@@ -97,13 +99,13 @@ class war3Map:
         if self.uppath == None:
             print("Cannot decode packed map: "+str(self))
         else:
-            #TODO: decode map
-        
-            self.initData()
+            self.readData(False)
+            self.ymlpath = "Work\\Maps\\"+self.name+"_yml"
+            self.data.write(self.ymlpath)
 
     def pack(self, debug = False, cleanVars = True):
         """
-        Packs the map's lni object back into its original .w3x.
+        Packs the map's yml object back into its original .w3x.
 
         Returns
         -------
@@ -114,26 +116,42 @@ class war3Map:
 
         if debug:
             print(message)
-
+            
+        """
         if cleanVars:
             self.data.trigData = triggerData(self.lnipath+'\\trigger')
             self.data.trigData.cleanUnusedVars()
+        """
+            
+        if self.ymlpath != None and os.path.exists(self.ymlpath):
+            
+            self.readData()
+            
+            if self.uppath != None and os.path.exists(self.uppath):
+                self.data.write(self.uppath, False)
+            else:
+                print("Can't pack map: "+self.name)
+            
+            w3x = StormLib.w3x(self.w3xpath)
+            w3x.pack(self.uppath, self.getHeader())
 
-        cwd = os.getcwd()
-        subprocess.run(["cmd", "/c", 'w2l.exe', "obj", cwd+"\\"+self.lnipath, self.w3xpath], cwd = constants.getGlobalOption('w3x2lni'))
+
         return self
 
     def close(self):
         """
-        Deletes the unpacked map folder, reversing the effect of unpack().
+        Deletes the yml and unpacked map folders, reversing the effect of unpack() and decode().
 
         Returns
         -------
         self
 
         """
-
-        if self.lnipath != None and os.path.exists(self.lnipath):
-            shutil.rmtree(self.lnipath)
-        self.lnipath = None
+        
+        if self.uppath != None and os.path.exists(self.uppath):
+            shutil.rmtree(self.uppath)
+        if self.ymlpath != None and os.path.exists(self.ymlpath):
+            shutil.rmtree(self.ymlpath)
+        self.uppath = None
+        self.ymlpath = None
         self.data = None

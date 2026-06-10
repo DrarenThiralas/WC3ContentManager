@@ -8,6 +8,7 @@ Created on Wed Mar 11 20:25:53 2026
 
 import os
 from extra.common import constants
+from extra.war3MapParsers.mapinfo import mapinfo
 
 class infoData:
     
@@ -20,7 +21,28 @@ class infoData:
         
     def getData(self):
         return self.data
+    
+    def getHeader(self):
         
+        info = mapinfo()
+        info.b = self.data['war3map.w3i']
+        info = info.getData()
+        
+        # Construct w3x header
+        header = bytearray()
+        header.append("HM3W".encode("UTF-8"))
+        header.append(int.to_bytes(0, 4, 'little'))
+        
+        header.append(info[2].encode('UTF-8')) # Map Name
+        header.append(int.to_bytes(info[20], 4, 'little')) # Map Flags
+        header.append(int.to_bytes(info[47], 4, 'little')) # Number of players
+        
+        # Add padding
+        num = 512-len(header)
+        header.append(bytes(num))
+        
+        return header
+    
     def read(self, path, isYml = True):
         
         f = path + ('\\info\\' if isYml else '\\')

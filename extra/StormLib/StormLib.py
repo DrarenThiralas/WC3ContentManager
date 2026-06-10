@@ -96,19 +96,16 @@ class w3x(mpq):
         self.ad_all(folder)
         self.cl()
         
-        #TODO: move this to mapData and finish it
         # add w3x header
-        """
         mp = None
         with open(self.path, 'rb') as file:
             mp = file.read()
             file.close()
+        with open(self.path, 'wb') as file:
+            file.write(header)
+            file.write(mp)
+            file.close()
             
-        header = bytearray()
-        header.append("HM3W".encode("UTF-8"))
-        header.append(int.to_bytes(0, 4, 'little'))
-        header.append()
-        """
         
         
 
